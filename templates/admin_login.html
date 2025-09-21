@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход в Админ-панель</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="admin-body">
+    <div id="app">
+        <div class="screen">
+            <div class="admin-login-container">
+                <h1>Вход в панель</h1>
+                <form method="POST" action="/admin/login" class="admin-login-form">
+                    <div class="form-group">
+                        <label for="password">Пароль</label>
+                        <input type="password" id="password" name="password" required class="admin-input">
+                    </div>
+                    {% if error %}
+                        <div class="error-message">{{ error }}</div>
+                    {% endif %}
+                    <button type="submit" class="btn btn--primary admin-btn">Войти</button>
+                </form>
+                <div class="back-link">
+                    <a href="/">Вернуться к игре</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

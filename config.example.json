@@ -1,0 +1,10 @@
+{
+    "SECRET_KEY": "super-secret-key",
+    "CONTENT_FOLDER": "content",
+    "UPLOAD_FOLDER": "content",
+    "MAX_CONTENT_LENGTH": 169148416,
+    "ADMIN_PASS": "admin-password",
+    "debug": true,
+    "host": "127.0.0.1",
+    "port": 5000
+}

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактор сценариев - VNE</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="creator-body">
+    <div class="creator-container">
+        <div class="creator-header">
+            <h1>Редактор сценариев</h1>
+            <div>
+                <a href="/" class="btn btn--secondary">Главное меню</a>
+            </div>
+        </div>
+
+        <div class="creator-card controls-card">
+            <div class="creator-card-content">
+                <h3>Действия с файлом</h3>
+                <div class="controls-wrapper">
+                    <button class="btn btn--primary" id="save-json-btn">Сохранить</button>
+                    <label for="load-json-input" class="btn btn--secondary">Загрузить</label>
+                    <input type="file" id="load-json-input" accept=".json" style="display: none;">
+                </div>
+            </div>
+        </div>
+
+        <div class="creator-card">
+            <h3>Данные сценария</h3>
+            <br>
+            <div class="grid">
+                <div class="form-group">
+                    <label for="scenario-id">ID Сценария</label>
+                    <input type="text" id="scenario-id" placeholder="my_scenario">
+                </div>
+                <div class="form-group">
+                    <label for="scenario-title">Название</label>
+                    <input type="text" id="scenario-title" placeholder="Название истории">
+                </div>
+                <div class="form-group">
+                    <label for="scenario-description">Описание</label>
+                    <input type="text" id="scenario-description" placeholder="Краткое описание сюжета">
+                </div>
+                 <div class="form-group">
+                    <label for="scenario-author">Автор</label>
+                    <input type="text" id="scenario-author" placeholder="Ваш никнейм">
+                </div>
+            </div>
+        </div>
+
+        <div id="dialogue-cards-container"></div>
+        <div class="add-dialogue-wrapper">
+            <button class="btn btn--primary" id="add-dialogue-btn">Добавить реплику</button>
+        </div>
+    </div>
+
+    <template id="dialogue-card-template">
+        <div class="card dialogue-card">
+            <button class="btn btn--danger btn--small remove-dialogue-btn">Удалить</button>
+            <h3>Реплика: <span class="dialogue-id-display"></span></h3>
+            <br>
+            <div class="grid">
+                <div class="form-group">
+                    <label>ID Реплики (латиница)</label>
+                    <input type="text" class="dialogue-id-input" placeholder="replic_id">
+                </div>
+                <div class="form-group">
+                    <label>Фон (Сцена)</label>
+                    <select class="scene-select"><option value="">-- Не менять --</option></select>
+                </div>
+                <div class="form-group">
+                    <label>Говорящий персонаж</label>
+                    <select class="speaker-select"><option value="">-- Рассказчик --</option></select>
+                </div>
+                <div class="form-group">
+                    <label>ID Следующей реплики</label>
+                    <select class="next-dialogue-select"><option value="">-- Не выбрано --</option></select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Текст реплики</label>
+                <textarea class="dialogue-text-input" rows="3"></textarea>
+            </div>
+            
+            <h4>Персонажи на сцене (до 2)</h4>
+            <br>
+            <div class="grid">
+                <div class="character-slot">
+                    <div class="form-group">
+                        <label>Персонаж 1</label>
+                        <select class="character-select"><option value="">-- Нет --</option></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Поза</label>
+                        <select class="pose-select"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Позиция</label>
+                        <select class="position-select">
+                            <option value="left">Слева</option>
+                            <option value="right">Справа</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="character-slot">
+                    <div class="form-group">
+                        <label>Персонаж 2</label>
+                        <select class="character-select"><option value="">-- Нет --</option></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Поза</label>
+                        <select class="pose-select"></select>
+                    </div>
+                     <div class="form-group">
+                        <label>Позиция</label>
+                        <select class="position-select">
+                            <option value="right">Справа</option>
+                            <option value="left">Слева</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <h4>Аудио</h4>
+            <br>
+            <div class="grid">
+                <div class="form-group">
+                    <label>Фоновая музыка (BGM)</label>
+                    <input type="text" class="bgm-input" placeholder="/static/audio/bgm/theme.mp3 или 'stop'">
+                </div>
+                <div class="form-group">
+                    <label>Звуковой эффект (SFX)</label>
+                    <input type="text" class="sfx-input" placeholder="/static/audio/sfx/effect.ogg">
+                </div>
+            </div>
+
+            <h4>Выборы (если есть)</h4>
+            <div class="choices-container"></div>
+            <button class="btn btn--small btn--secondary add-choice-btn">Добавить выбор</button>
+        </div>
+    </template>
+
+    <template id="choice-row-template">
+        <div class="choice-row" style="display: flex; gap: 10px; align-items: center; margin-bottom: 5px;">
+            <input type="text" class="choice-text-input" placeholder="Текст выбора" style="flex-grow: 1;">
+            <select class="choice-next-select" style="width: 200px;"></select>
+            <span class="remove-btn" title="Удалить выбор">✖</span>
+        </div>
+    </template>
+
+    <script id="characters-data" type="application/json">
+        {{ characters_json|safe }}
+    </script>
+    <script id="scenes-data" type="application/json">
+        {{ scenes_json|safe }}
+    </script>
+    <script src="{{ url_for('static', filename='js/scenario_creator.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VNE v1.488</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body data-scenario-to-start="{{ scenario_to_start or '' }}">
+    <div id="app">
+        <div id="mainMenu" class="screen">
+            <div class="menu-container">
+                <h1 class="game-title">VNE v1.488</h1>
+                <div class="game-info">
+                    <p>still web, still demo</p>
+                </div>
+                <div class="menu-buttons">
+                    <button class="btn btn--primary menu-btn" onclick="showScenarioSelection()">Начать игру</button>
+                    <a href="/scenario-creator" class="btn btn--secondary menu-btn">Редактор сценариев</a>
+                    <button class="btn btn--secondary menu-btn" onclick="showSettings()">Настройки</button>
+                    
+                </div>
+            </div>
+        </div>
+
+        <div id="scenarioSelectionMenu" class="screen hidden">
+            <div class="menu-container">
+                <h1 class="game-title">Выбор сценария</h1>
+                <div id="scenarioList" class="menu-buttons">
+                </div>
+                <button class="btn btn--secondary" onclick="showMainMenu()">← Назад</button>
+            </div>
+        </div>
+
+
+        <div id="settingsMenu" class="screen hidden">
+            <div class="settings-container">
+                <h2>Настройки</h2>
+                <div class="settings-section">
+                    <label class="setting-label">
+                        <span>Скорость текста:</span>
+                        <input type="range" id="textSpeed" min="10" max="100" value="30" oninput="updateTextSpeed(this.value)">
+                        <span id="textSpeedValue">30ms</span>
+                    </label>
+                    <label class="setting-label">
+                        <span>Громкость:</span>
+                        <input type="range" id="volumeControl" min="0" max="1" step="0.05" value="0.5" oninput="updateVolume(this.value)">
+                        <span id="volumeValue">50%</span>
+                    </label>
+                    <label class="setting-label">
+                        <span>Полноэкранный режим:</span>
+                        <input type="checkbox" id="fullscreen" onchange="toggleFullscreen(this.checked)">
+                    </label>
+                </div>
+                <button class="btn btn--primary" onclick="hideSettings()">Вернуться</button>
+            </div>
+        </div>
+
+        <div id="gameScreen" class="screen hidden">
+            <div class="game-container">
+                <div id="scenarioInfo" class="scenario-info">
+                    <div id="scenarioTitle"></div>
+                    <div id="scenarioAuthor"></div>
+                </div>
+                <div id="backgroundContainer" class="background-container">
+                    <img id="backgroundImage1" class="background-image active" src="" alt="Background">
+                    <img id="backgroundImage2" class="background-image" src="" alt="Background">
+                </div>
+
+                    <div id="charactersContainer" class="characters-container">
+                        <div id="leftCharacter" class="character-sprite character--left hidden">
+                            <img id="leftCharacterImage" alt="Character">
+                        </div>
+                        <div id="rightCharacter" class="character-sprite character--right hidden">
+                            <img id="rightCharacterImage" alt="Character">
+                        </div>
+                    </div>
+
+                <div id="dialogueBox" class="dialogue-box">
+                    <div id="characterName" class="character-name hidden"></div>
+                    <div id="dialogueText" class="dialogue-text"></div>
+                    <div id="choicesContainer" class="choices-container hidden"></div>
+                    <div id="clickIndicator" class="click-indicator hidden">▼</div>
+                </div>
+
+                <div class="game-ui">
+                    <button class="btn btn--small ui-btn" onclick="showMainMenu()" title="Главное меню">Меню</button>
+                    <button class="btn btn--small ui-btn" onclick="showSettings()" title="Настройки">Настройки</button>
+                    <button class="btn btn--small ui-btn" onclick="showHistory()" title="История диалогов">История</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="historyScreen" class="screen hidden">
+            <div class="history-container">
+                <h2>История диалогов</h2>
+                <div id="historyContent" class="history-content">
+                </div>
+                <button class="btn btn--primary" onclick="hideHistory()">Закрыть</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/game.js') }}"></script>
+
+    <audio id="bgmPlayer" loop></audio>
+    <audio id="sfxPlayer"></audio>
+</body>
+</html>

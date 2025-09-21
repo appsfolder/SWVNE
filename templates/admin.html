@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ-панель</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="admin-body">
+    <div class="admin-container-new">
+        <header class="admin-header-new">
+            <h1>Панель управления</h1>
+            <div class="admin-actions">
+                <a href="/" class="btn btn--secondary">К игре</a>
+                <a href="/admin/logout" class="btn btn--danger">Выйти</a>
+            </div>
+        </header>
+
+        <main class="admin-main-content">
+            <div class="content-card">
+                <div class="card-header">
+                    <h2>Персонажи</h2>
+                    <span class="stat-value" id="charactersCount">-</span>
+                </div>
+                <div class="card-body">
+                    <div class="file-input-wrapper">
+                        <input type="file" id="charactersFile" accept=".json" class="file-input-hidden">
+                        <label for="charactersFile" class="file-input-label"><span>Выберите файл...</span></label>
+                    </div>
+                    <button class="btn btn--primary" onclick="uploadCharacters()">Загрузить</button>
+                    <button class="btn btn--secondary" onclick="exportContent('characters')">Скачать</button>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <div class="card-header">
+                    <h2>Сцены</h2>
+                    <span class="stat-value" id="scenesCount">-</span>
+                </div>
+                <div class="card-body">
+                    <div class="file-input-wrapper">
+                         <input type="file" id="scenesFile" accept=".json" class="file-input-hidden">
+                        <label for="scenesFile" class="file-input-label"><span>Выберите файл...</span></label>
+                    </div>
+                    <button class="btn btn--primary" onclick="uploadScenes()">Загрузить</button>
+                    <button class="btn btn--secondary" onclick="exportContent('scenes')">Скачать</button>
+                </div>
+            </div>
+            
+            <div class="content-card">
+                <div class="card-header">
+                    <h2>Сценарии</h2>
+                    <span class="stat-value" id="scenariosCount">-</span>
+                </div>
+                <div class="card-body">
+                     <div class="file-input-wrapper">
+                        <input type="file" id="scenariosFile" accept=".json" class="file-input-hidden">
+                        <label for="scenariosFile" class="file-input-label"><span>Выберите файл...</span></label>
+                    </div>
+                    <button class="btn btn--primary" onclick="uploadScenarios()">Загрузить</button>
+                    <button class="btn btn--secondary" onclick="exportContent('scenarios')">Скачать</button>
+                </div>
+            </div>
+        </main>
+        
+        <footer id="uploadStatus" class="upload-status"></footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+    <script>
+        document.querySelectorAll('.file-input-hidden').forEach(input => {
+            input.addEventListener('change', function() {
+                const fileName = this.files[0] ? this.files[0].name : 'Выберите файл...';
+                this.nextElementSibling.querySelector('span').textContent = fileName;
+            });
+        });
+    </script>
+</body>
+</html>

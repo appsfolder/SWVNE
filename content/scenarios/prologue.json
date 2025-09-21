@@ -1,0 +1,104 @@
+{
+  "scenarios": {
+    "prologue": {
+      "title": "Тестовый сценарий: Странная встреча в Баку",
+      "description": "История о том, как Адам чуть не купил прошку двухсотика.",
+      "author": "Goon Test Team",
+      "start_dialogue": "start",
+      "dialogues": {
+        "start":{
+          "scene": "baku",
+          "characters_on_screen": [],
+          "text": "Однажды в Баку...",
+          "next": "start1",
+          "bgm": "/static/audio/bgm/calm_background.mp3"
+        },
+        "start1": {
+          "scene": "baku",
+          "characters_on_screen": [
+            { "id": "adam", "position": "left", "pose": "curious" }
+          ],
+          "character": "adam",
+          "text": "Хм-м... Купить двухсотик про на межятеке или не купить.",
+          "next": "feixiao_enters"
+        },
+        "feixiao_enters": {
+          "scene": "baku",
+          "characters_on_screen": [
+            { "id": "adam", "position": "left", "pose": "neutral" },
+            { "id": "feixiao", "position": "right", "pose": "happy" }
+          ],
+          "character": "feixiao",
+          "text": "Адам! Нашла тебя! Ты заебал про виво болтать, полетели нахуй из баку.",
+          "next": "adam_responds"
+        },
+        "adam_responds": {
+          "scene": "baku",
+          "characters_on_screen": [
+            { "id": "adam", "position": "left", "pose": "happy" },
+            { "id": "feixiao", "position": "right", "pose": "neutral" }
+          ],
+          "character": "adam",
+          "text": "Ээ не я кулер купил мне теперь двухсотик прошка не нужен!",
+          "next": "feixiao_worried"
+        },
+        "feixiao_worried": {
+          "scene": "baku",
+          "characters_on_screen": [
+            { "id": "adam", "position": "left", "pose": "neutral" },
+            { "id": "feixiao", "position": "right", "pose": "sad" }
+          ],
+          "character": "feixiao",
+          "text": "Адам, Посмотри на себя, что ты делаешь? Задумайся...",
+          "next": "adam_choice"
+        },
+        "adam_choice": {
+          "scene": "baku",
+          "characters_on_screen": [
+            { "id": "adam", "position": "left", "pose": "shy" },
+            { "id": "feixiao", "position": "right", "pose": "curious" }
+          ],
+          "character": "adam",
+          "text": "Прости... я просто хочу разогнать двухсотик. Но, возможно, ты права.",
+          "choices": [
+            {
+              "text": "Согласиться с Фэйсяо и пойти на самолет в москву.",
+              "next": "go_to_garden"
+            },
+            {
+              "text": "Подожди немного, мне нужно запустить ззз в 240 кадров.",
+              "next": "stay_in_lab"
+            }
+          ]
+        },
+        "go_to_garden": {
+          "scene": "aeroport_baku",
+          "characters_on_screen": [
+            { "id": "adam", "position": "left", "pose": "happy" },
+            { "id": "feixiao", "position": "right", "pose": "happy" }
+          ],
+          "character": "feixiao",
+          "text": "Давай наконец съебем из этого Баку!",
+          "next": "end_demo"
+        },
+        "stay_in_lab": {
+          "scene": "baku",
+          "characters_on_screen": [
+            { "id": "adam", "position": "left", "pose": "neutral" },
+            { "id": "feixiao", "position": "right", "pose": "sad" }
+          ],
+          "character": "feixiao",
+          "text": "Хорошо... Я подожду тебя в аэропорту. Только не гунь на виво слишком долго, пожалуйста.",
+          "next": "end_demo"
+        },
+        "end_demo": {
+          "scene": "baku",
+          "characters_on_screen": [],
+          "character": null,
+          "text": "Это финал короткой демо-истории... Кто знает, что нас ждет в будущем?",
+          "bgm": "stop"
+        }
+      }
+    }
+  }
+}

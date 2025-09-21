@@ -1,0 +1,12 @@
+{
+  "scenes": {
+    "baku": {
+      "name": "Баку",
+      "background": "/static/locations/baku.webp"
+    },
+    "aeroport_baku": {
+      "name": "Аэропорт",
+      "background": "/static/locations/aeroport_baku.jpg"
+    }
+  }
+}
