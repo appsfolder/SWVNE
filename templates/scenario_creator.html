@@ -83,42 +83,13 @@
                 <textarea class="dialogue-text-input" rows="3"></textarea>
             </div>
             
-            <h4>Персонажи на сцене (до 2)</h4>
-            <br>
-            <div class="grid">
-                <div class="character-slot">
-                    <div class="form-group">
-                        <label>Персонаж 1</label>
-                        <select class="character-select"><option value="">-- Нет --</option></select>
-                    </div>
-                    <div class="form-group">
-                        <label>Поза</label>
-                        <select class="pose-select"></select>
-                    </div>
-                    <div class="form-group">
-                        <label>Позиция</label>
-                        <select class="position-select">
-                            <option value="left">Слева</option>
-                            <option value="right">Справа</option>
-                        </select>
-                    </div>
+            <div class="characters-section">
+                <div class="characters-header">
+                    <h4>Персонажи на сцене</h4>
+                    <button class="btn btn--small btn--secondary add-character-btn" type="button">Добавить персонажа</button>
                 </div>
-                <div class="character-slot">
-                    <div class="form-group">
-                        <label>Персонаж 2</label>
-                        <select class="character-select"><option value="">-- Нет --</option></select>
-                    </div>
-                    <div class="form-group">
-                        <label>Поза</label>
-                        <select class="pose-select"></select>
-                    </div>
-                     <div class="form-group">
-                        <label>Позиция</label>
-                        <select class="position-select">
-                            <option value="right">Справа</option>
-                            <option value="left">Слева</option>
-                        </select>
-                    </div>
+                <div class="characters-slots-container">
+                    <!-- Character slots will be dynamically added here -->
                 </div>
             </div>
 
@@ -146,6 +117,25 @@
             <input type="text" class="choice-text-input" placeholder="Текст выбора" style="flex-grow: 1;">
             <select class="choice-next-select" style="width: 200px;"></select>
             <span class="remove-btn" title="Удалить выбор">✖</span>
+        </div>
+    </template>
+
+    <template id="character-slot-template">
+        <div class="character-slot">
+            <div class="character-slot-header">
+                <span class="character-slot-title">Персонаж <span class="slot-number">1</span></span>
+                <button class="btn btn--danger btn--small remove-character-btn" type="button">Удалить</button>
+            </div>
+            <div class="character-slot-content">
+                <div class="form-group">
+                    <label>Персонаж</label>
+                    <select class="character-select"><option value="">-- Нет --</option></select>
+                </div>
+                <div class="form-group">
+                    <label>Поза</label>
+                    <select class="pose-select"></select>
+                </div>
+            </div>
         </div>
     </template>
 

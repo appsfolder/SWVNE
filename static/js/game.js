@@ -340,7 +340,66 @@ class VisualNovelEngine {
             inactiveBg.onerror = null;
         }
     }
-    renderCharacters(charactersOnScreen, speakerId) { const leftCharDiv = document.getElementById('leftCharacter'); const rightCharDiv = document.getElementById('rightCharacter'); leftCharDiv.classList.add('hidden'); rightCharDiv.classList.add('hidden'); leftCharDiv.classList.remove('active-speaker'); rightCharDiv.classList.remove('active-speaker'); if (!charactersOnScreen || charactersOnScreen.length === 0) { return; } charactersOnScreen.forEach(charInfo => { const charData = this.gameData.characters[charInfo.id]; if (!charData) { console.warn(`Character data not found for id: ${charInfo.id}`); return; } const pose = charInfo.pose || 'neutral'; if (!charData.poses[pose]) { console.warn(`Pose not found: ${charInfo.id}.${pose}`); return; } const position = charInfo.position; const charContainer = document.getElementById(`${position}Character`); const charImage = document.getElementById(`${position}CharacterImage`); if (charContainer && charImage) { charImage.src = charData.poses[pose]; charContainer.classList.remove('hidden'); if (charInfo.id === speakerId) { charContainer.classList.add('active-speaker'); } } }); }
+    renderCharacters(charactersOnScreen, speakerId) {
+        const charactersContainer = document.getElementById('charactersContainer');
+        
+        // Clear existing characters
+        charactersContainer.innerHTML = '';
+        
+        if (!charactersOnScreen || charactersOnScreen.length === 0) {
+            return;
+        }
+        
+        const numCharacters = charactersOnScreen.length;
+        
+        charactersOnScreen.forEach((charInfo, index) => {
+            const charData = this.gameData.characters[charInfo.id];
+            if (!charData) {
+                console.warn(`Character data not found for id: ${charInfo.id}`);
+                return;
+            }
+            
+            const pose = charInfo.pose || 'neutral';
+            if (!charData.poses[pose]) {
+                console.warn(`Pose not found: ${charInfo.id}.${pose}`);
+                return;
+            }
+            
+            // Create character element
+            const charContainer = document.createElement('div');
+            charContainer.className = 'character-sprite';
+            charContainer.id = `character-${charInfo.id}-${index}`;
+            
+            const charImage = document.createElement('img');
+            charImage.src = charData.poses[pose];
+            charImage.alt = charData.name;
+            
+            charContainer.appendChild(charImage);
+            
+            // Calculate position based on number of characters and index
+            let leftPosition;
+            if (numCharacters === 1) {
+                leftPosition = 50; // Center
+            } else if (numCharacters === 2) {
+                leftPosition = index === 0 ? 25 : 75; // Left/Right like before
+            } else {
+                // Distribute evenly across screen with some padding
+                const spacing = 80 / (numCharacters - 1); // 80% of screen width
+                leftPosition = 10 + (index * spacing); // Start at 10% from left
+            }
+            
+            // Apply position
+            charContainer.style.left = `${leftPosition}%`;
+            charContainer.style.transform = 'translateX(-50%)';
+            
+            // Handle speaker highlighting
+            if (charInfo.id === speakerId) {
+                charContainer.classList.add('active-speaker');
+            }
+            
+            charactersContainer.appendChild(charContainer);
+        });
+    }
     setCharacterName(name, color = '#20c997') { const nameElement = document.getElementById('characterName'); nameElement.textContent = name; nameElement.style.backgroundColor = color; nameElement.classList.remove('hidden'); }
     hideCharacterName() { document.getElementById('characterName').classList.add('hidden'); }
     async typeText(text) { const dialogueTextElement = document.getElementById('dialogueText'); this.isTyping = true; this.currentText = ''; dialogueTextElement.innerHTML = ''; for (let i = 0; i < text.length; i++) { if (!this.isTyping) break; this.currentText += text[i]; dialogueTextElement.innerHTML = this.currentText + '<span class="typing-cursor">|</span>'; await new Promise(resolve => setTimeout(resolve, this.settings.textSpeed)); } this.isTyping = false; dialogueTextElement.innerHTML = text; }
