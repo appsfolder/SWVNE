@@ -165,29 +165,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function handlePositionChange(changedSelect, card) {
-        const allPositionSelects = card.querySelectorAll('.position-select');
-        const selectedPositions = new Set();
-        
-        allPositionSelects.forEach(select => {
-            if (select !== changedSelect && select.closest('.character-slot').querySelector('.character-select').value) {
-                selectedPositions.add(select.value);
-            }
-        });
+        const allSlots = Array.from(card.querySelectorAll('.character-slot'));
+        const [slot1, slot2] = allSlots;
+        const pos1 = slot1.querySelector('.position-select');
+        const pos2 = slot2.querySelector('.position-select');
+        const char1 = slot1.querySelector('.character-select').value;
+        const char2 = slot2.querySelector('.character-select').value;
 
-        allPositionSelects.forEach(select => {
-            if (select === changedSelect) return;
-
-            const otherSelectValue = select.value;
-            const changedSelectValue = changedSelect.value;
-            
-            if (otherSelectValue === changedSelectValue && select.closest('.character-slot').querySelector('.character-select').value) {
-                const availableOption = Array.from(select.options).find(opt => opt.value !== changedSelectValue);
-                if (availableOption) {
-                    select.value = availableOption.value;
+        if (char1 && char2) {
+            if (pos1.value === pos2.value) {
+                if (changedSelect === pos1) {
+                    pos2.value = (pos1.value === "left") ? "right" : "left";
+                } else {
+                    pos1.value = (pos2.value === "left") ? "right" : "left";
                 }
             }
-        });
+        }
     }
+
 
     function handleStateUpdate(e) {
         const target = e.target;
