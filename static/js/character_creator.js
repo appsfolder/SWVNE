@@ -25,6 +25,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadSelect = document.getElementById('load-character-select');
     const loadBtn = document.getElementById('load-character-btn');
     const newBtn = document.getElementById('new-character-btn');
+    const exportBtn = document.getElementById('export-character-btn');
+    const importBtn = document.getElementById('import-character-btn');
+    const importInput = document.getElementById('import-character-input');
     const progressDiv = document.getElementById('upload-progress');
     const progressFill = document.getElementById('progress-fill');
     const progressText = document.getElementById('progress-text');
@@ -368,6 +371,143 @@ document.addEventListener('DOMContentLoaded', () => {
             loadCharacter(selectedCharacter);
         } else {
             notifications.warning('Выбор персонажа', 'Пожалуйста, выберите персонажа для загрузки.');
+        }
+    });
+    
+    function exportCharacter() {
+        updateCharacterState();
+        
+        if (!characterState.id || !characterState.name) {
+            notifications.error('Необходимые данные', 'Пожалуйста, укажите ID и имя персонажа перед экспортом');
+            return;
+        }
+        
+        const characterData = {
+            characters: {
+                [characterState.id]: {
+                    name: characterState.name,
+                    color: characterState.color,
+                    poses: characterState.poses
+                }
+            }
+        };
+        
+        const jsonString = JSON.stringify(characterData, null, 2);
+        const blob = new Blob([jsonString], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${characterState.id}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        notifications.success('Экспорт завершён', `Файл ${characterState.id}.json скачан успешно`);
+    }
+    
+    function importCharacter(file) {
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+            try {
+                const data = JSON.parse(e.target.result);
+                
+                if (!data.characters) {
+                    throw new Error('Неверный формат файла. Отсутствует секция "characters".');
+                }
+                
+                const characterIds = Object.keys(data.characters);
+                if (characterIds.length === 0) {
+                    throw new Error('Файл не содержит персонажей.');
+                }
+                
+                const characterId = characterIds[0];
+                const loadedCharacter = data.characters[characterId];
+                
+                if (characterState.id || characterState.name) {
+                    const shouldImport = await notifications.confirm(
+                        'Подтверждение импорта', 
+                        `Импортировать персонажа "${loadedCharacter.name || characterId}"?\n\nТекущие несохранённые изменения будут потеряны.`
+                    );
+                    
+                    if (!shouldImport) {
+                        return;
+                    }
+                }
+                
+                idInput.value = characterId;
+                nameInput.value = loadedCharacter.name || '';
+                colorInput.value = loadedCharacter.color || '#20c997';
+                
+                characterState = {
+                    id: characterId,
+                    name: loadedCharacter.name || '',
+                    color: loadedCharacter.color || '#20c997',
+                    poses: {}
+                };
+                
+                const posesData = loadedCharacter.poses || {};
+                
+                poseKeys.forEach(key => {
+                    const slot = document.getElementById(`slot-${key}`);
+                    const preview = document.getElementById(`preview-${key}`);
+                    const wrapper = document.getElementById(`wrapper-${key}`);
+                    const placeholder = document.getElementById(`placeholder-${key}`);
+                    const status = document.getElementById(`status-${key}`);
+                    const fileInput = document.getElementById(`file-${key}`);
+                    
+                    wrapper.style.display = 'none';
+                    placeholder.style.display = 'flex';
+                    slot.classList.remove('filled', 'uploading');
+                    status.style.display = 'none';
+                    fileInput.value = '';
+                });
+                
+                for (const [poseName, imagePath] of Object.entries(posesData)) {
+                    if (poseKeys.includes(poseName)) {
+                        const slot = document.getElementById(`slot-${poseName}`);
+                        const preview = document.getElementById(`preview-${poseName}`);
+                        const wrapper = document.getElementById(`wrapper-${poseName}`);
+                        const placeholder = document.getElementById(`placeholder-${poseName}`);
+                        const status = document.getElementById(`status-${poseName}`);
+                        
+                        if (imagePath) {
+                            preview.src = imagePath;
+                            wrapper.style.display = 'block';
+                            placeholder.style.display = 'none';
+                            slot.classList.add('filled');
+                            status.style.display = 'block';
+                            status.className = 'pose-status success';
+                            status.textContent = 'Загружено';
+                            characterState.poses[poseName] = imagePath;
+                        }
+                    }
+                }
+                
+                notifications.success('Импорт завершён', `Персонаж "${loadedCharacter.name || characterId}" загружен успешно`);
+                
+            } catch (error) {
+                console.error('Import error:', error);
+                notifications.error('Ошибка импорта', error.message);
+            } finally {
+                importInput.value = '';
+            }
+        };
+        
+        reader.readAsText(file);
+    }
+    
+    exportBtn.addEventListener('click', exportCharacter);
+    
+    importBtn.addEventListener('click', () => {
+        importInput.click();
+    });
+    
+    importInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            importCharacter(file);
         }
     });
     
