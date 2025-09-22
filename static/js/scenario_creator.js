@@ -630,7 +630,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function saveScenario() {
         if (!scenarioState.meta.id) {
-            alert('Пожалуйста, укажите ID сценария!');
+            notifications.error('Необходимые данные', 'Пожалуйста, укажите ID сценария!');
             return;
         }
         
@@ -658,14 +658,22 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await response.json();
             
             if (result.success) {
-                alert(result.message);
+                notifications.success('Успешно', result.message);
                 await loadScenariosList();
+            } else if (result.requires_auth) {
+                // Authentication required - prompt for login
+                const authenticated = await auth.ensureAuthenticated();
+                if (authenticated) {
+                    // Retry the save operation
+                    await saveScenario();
+                    return;
+                }
             } else {
-                alert('Ошибка сохранения: ' + result.error);
+                notifications.error('Ошибка сохранения', result.error);
             }
         } catch (error) {
             console.error('Error saving scenario:', error);
-            alert('Ошибка сохранения сценария');
+            notifications.error('Ошибка сохранения', 'Не удалось сохранить сценарий');
         }
     }
     
@@ -698,18 +706,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             
             if (data.error) {
-                alert('Ошибка загрузки: ' + data.error);
+                notifications.error('Ошибка загрузки', data.error);
                 return;
             }
             
             if (!data.scenarios) {
-                alert('Неверный формат данных');
+                notifications.error('Ошибка данных', 'Неверный формат данных');
                 return;
             }
             
             const loadedScenario = data.scenarios[scenarioId];
             if (!loadedScenario) {
-                alert('Сценарий не найден');
+                notifications.error('Ошибка загрузки', 'Сценарий не найден');
                 return;
             }
             
@@ -721,16 +729,17 @@ document.addEventListener('DOMContentLoaded', () => {
             scenarioState.dialogues = loadedScenario.dialogues || { 'start': { text: '', scene: '' } };
             
             renderAll();
-            alert('Сценарий загружен успешно!');
+            notifications.success('Загрузка завершена', 'Сценарий загружен успешно!');
             
         } catch (error) {
             console.error('Error loading scenario:', error);
-            alert('Ошибка загрузки сценария');
+            notifications.error('Ошибка загрузки', 'Не удалось загрузить сценарий');
         }
     }
     
-    function createNewScenario() {
-        if (confirm('Создать новый сценарий? Несохранённые изменения будут потеряны.')) {
+    async function createNewScenario() {
+        const shouldCreate = await notifications.confirm('Новый сценарий', 'Создать новый сценарий?\n\nНесохранённые изменения будут потеряны.');
+        if (shouldCreate) {
             scenarioState = {
                 meta: {
                     id: '',
@@ -752,7 +761,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (selectedScenario) {
             loadScenario(selectedScenario);
         } else {
-            alert('Пожалуйста, выберите сценарий для загрузки.');
+            notifications.warning('Выбор сценария', 'Пожалуйста, выберите сценарий для загрузки.');
         }
     });
     

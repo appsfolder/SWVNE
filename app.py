@@ -123,6 +123,30 @@ def admin_logout():
     session.pop('admin_logged_in', None)
     return redirect(url_for('index'))
 
+@app.route('/api/auth/status')
+def auth_status():
+    """Check if user is authenticated as admin."""
+    return jsonify({
+        'authenticated': check_admin(),
+        'admin': check_admin()
+    })
+
+@app.route('/api/auth/login', methods=['POST'])
+def api_login():
+    """API endpoint for admin login."""
+    try:
+        password = request.json.get('password', '')
+        password_hash = hashlib.sha256(password.encode()).hexdigest()
+        
+        if password_hash == ADMIN_PASSWORD_HASH:
+            session['admin_logged_in'] = True
+            return jsonify({'success': True, 'message': 'Авторизация успешна'})
+        else:
+            return jsonify({'success': False, 'error': 'Неверный пароль'}), 401
+            
+    except Exception as e:
+        return jsonify({'success': False, 'error': 'Ошибка сервера'}), 500
+
 @app.route('/api/content/characters')
 def get_characters():
     manager = VisualNovelManager(content_dir)
@@ -234,7 +258,7 @@ def save_scenario():
     """Save scenario data to file."""
     # SECURITY: Require admin authentication
     if not check_admin():
-        return jsonify({'success': False, 'error': 'Доступ запрещён'}), 403
+        return jsonify({'success': False, 'error': 'Доступ запрещён', 'requires_auth': True}), 403
         
     try:
         scenario_data = request.json
@@ -321,7 +345,7 @@ def save_character():
     """Save character data to file."""
     # SECURITY: Require admin authentication for character modifications
     if not check_admin():
-        return jsonify({'success': False, 'error': 'Доступ запрещён'}), 403
+        return jsonify({'success': False, 'error': 'Доступ запрещён', 'requires_auth': True}), 403
         
     try:
         character_data = request.json.get('characters', {})
@@ -366,7 +390,7 @@ def upload_character_image():
     """Upload character pose image."""
     # SECURITY: Require admin authentication for character modifications
     if not check_admin():
-        return jsonify({'success': False, 'error': 'Доступ запрещён'}), 403
+        return jsonify({'success': False, 'error': 'Доступ запрещён', 'requires_auth': True}), 403
         
     try:
         if 'image' not in request.files:
