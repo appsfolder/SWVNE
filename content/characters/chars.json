@@ -3,6 +3,7 @@
     "adam": {
       "name": "Адам",
       "color": "#d1b380",
+      "voice": "",
       "poses": {
         "neutral": "/static/character_images/adam/neutral.png",
         "happy": "/static/character_images/adam/happy.png",
@@ -15,6 +16,7 @@
     "feixiao": {
       "name": "Фэйсяо",
       "color": "#78cfb5",
+      "voice": "",
       "poses": {
         "neutral": "/static/character_images/feixiao/neutral.png",
         "happy": "/static/character_images/feixiao/happy.png",
@@ -27,6 +29,7 @@
     "ali_makim": {
       "name": "Али Маким",
       "color": "#a0deee",
+      "voice": "",
       "poses": {
         "happy": "/static/character_images/ali_makim/happy.png",
         "sad": "/static/character_images/ali_makim/sad.png",
@@ -34,6 +37,19 @@
         "shy": "/static/character_images/ali_makim/shy.png",
         "curious": "/static/character_images/ali_makim/curious.png",
         "neutral": "/static/character_images/ali_makim/neutral.png"
+      }
+    },
+    "vadim_gefnider": {
+      "name": "Вадим Гефнидер",
+      "color": "#787fdd",
+      "voice": "",
+      "poses": {
+        "neutral": "/static/character_images/vadim_gefnider/neutral.png",
+        "happy": "/static/character_images/vadim_gefnider/happy.png",
+        "sad": "/static/character_images/vadim_gefnider/sad.png",
+        "angry": "/static/character_images/vadim_gefnider/angry.png",
+        "shy": "/static/character_images/vadim_gefnider/shy.png",
+        "curious": "/static/character_images/vadim_gefnider/curious.png"
       }
     }
   }

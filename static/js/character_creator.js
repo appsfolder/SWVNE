@@ -9,10 +9,13 @@ document.addEventListener('DOMContentLoaded', () => {
         'curious': 'Любопытное\n(curious)'
     };
 
+    const voicesData = JSON.parse(document.getElementById('voices-data').textContent) || {};
+
     let characterState = {
         id: '',
         name: '',
         color: '#20c997',
+        voice: '',
         poses: {}
     };
 
@@ -20,6 +23,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const idInput = document.getElementById('char-id');
     const nameInput = document.getElementById('char-name');
     const colorInput = document.getElementById('char-color');
+    const voiceSelect = document.getElementById('char-voice');
+    const voicePreviewBtn = document.querySelector('.audio-preview-btn[data-type="voice"]');
     const saveBtn = document.getElementById('save-character-btn');
     const loadSelect = document.getElementById('load-character-select');
     const loadBtn = document.getElementById('load-character-btn');
@@ -30,6 +35,33 @@ document.addEventListener('DOMContentLoaded', () => {
     const progressDiv = document.getElementById('upload-progress');
     const progressFill = document.getElementById('progress-fill');
     const progressText = document.getElementById('progress-text');
+
+    const previewPlayer = new Audio();
+    let currentPreviewButton = null;
+
+    const resetPreviewButton = () => {
+        if (currentPreviewButton) {
+            currentPreviewButton.textContent = '▶';
+            currentPreviewButton = null;
+        }
+    };
+    
+    const updatePreviewButtonState = () => {
+        const hasValue = voiceSelect.value;
+        if (hasValue) {
+            voicePreviewBtn.disabled = false;
+            voicePreviewBtn.classList.remove('btn--disabled');
+            voicePreviewBtn.classList.add('btn--secondary');
+        } else {
+            voicePreviewBtn.disabled = true;
+            voicePreviewBtn.classList.remove('btn--secondary');
+            voicePreviewBtn.classList.add('btn--disabled');
+            previewPlayer.pause();
+        }
+    };
+
+    previewPlayer.addEventListener('pause', resetPreviewButton);
+    previewPlayer.addEventListener('ended', resetPreviewButton);
 
     function initializePoseSlots() {
         poseGrid.innerHTML = '';
@@ -63,6 +95,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    function populateVoiceDropdown() {
+        voiceSelect.innerHTML = '<option value="">-- Не выбран --</option>';
+        for (const voiceId in voicesData) {
+            const voice = voicesData[voiceId];
+            const option = document.createElement('option');
+            option.value = voiceId;
+            option.textContent = voice.name;
+            if (voice.gender === 'F') {
+                option.classList.add('voice-female');
+            } else if (voice.gender === 'M') {
+                option.classList.add('voice-male');
+            }
+            voiceSelect.appendChild(option);
+        }
+        updatePreviewButtonState();
+    }
+
     function sanitizeId(value) {
         if (!value) return '';
         return value.toLowerCase()
@@ -74,6 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
         characterState.id = sanitizeId(idInput.value);
         characterState.name = nameInput.value;
         characterState.color = colorInput.value;
+        characterState.voice = voiceSelect.value;
     }
 
     async function handleFileUpload(e, key) {
@@ -177,6 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     [characterState.id]: {
                         name: characterState.name,
                         color: characterState.color,
+                        voice: characterState.voice,
                         poses: characterState.poses
                     }
                 }
@@ -246,11 +297,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 idInput.value = characterId;
                 nameInput.value = char.name || '';
                 colorInput.value = char.color || '#20c997';
+                voiceSelect.value = char.voice || '';
+                updatePreviewButtonState();
                 
                 characterState = {
                     id: characterId,
                     name: char.name || '',
                     color: char.color || '#20c997',
+                    voice: char.voice || '',
                     poses: char.poses || {}
                 };
                 
@@ -295,11 +349,14 @@ document.addEventListener('DOMContentLoaded', () => {
             idInput.value = '';
             nameInput.value = '';
             colorInput.value = '#20c997';
+            voiceSelect.value = '';
+            updatePreviewButtonState();
             
             characterState = {
                 id: '',
                 name: '',
                 color: '#20c997',
+                voice: '',
                 poses: {}
             };
             
@@ -360,6 +417,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 [characterState.id]: {
                     name: characterState.name,
                     color: characterState.color,
+                    voice: characterState.voice,
                     poses: characterState.poses
                 }
             }
@@ -412,11 +470,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 idInput.value = characterId;
                 nameInput.value = loadedCharacter.name || '';
                 colorInput.value = loadedCharacter.color || '#20c997';
+                voiceSelect.value = loadedCharacter.voice || '';
+                updatePreviewButtonState();
                 
                 characterState = {
                     id: characterId,
                     name: loadedCharacter.name || '',
                     color: loadedCharacter.color || '#20c997',
+                    voice: loadedCharacter.voice || '',
                     poses: {}
                 };
                 
@@ -486,6 +547,29 @@ document.addEventListener('DOMContentLoaded', () => {
     
     newBtn.addEventListener('click', createNewCharacter);
 
+    voiceSelect.addEventListener('change', updatePreviewButtonState);
+    
+    voicePreviewBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const selectedVoiceId = voiceSelect.value;
+        const selectedVoiceData = voicesData[selectedVoiceId];
+
+        if (e.target === currentPreviewButton && !previewPlayer.paused) {
+            previewPlayer.pause();
+            return;
+        }
+
+        previewPlayer.pause();
+
+        if (selectedVoiceData && selectedVoiceData.example) {
+            previewPlayer.src = selectedVoiceData.example;
+            previewPlayer.play();
+            currentPreviewButton = e.target;
+            e.target.textContent = '❚❚';
+        }
+    });
+
     initializePoseSlots();
+    populateVoiceDropdown();
     loadCharactersList();
 });
