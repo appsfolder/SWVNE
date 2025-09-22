@@ -726,6 +726,12 @@ body.creator-body, body.admin-body {
     margin-bottom: 15px;
 }
 
+.character-slot-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 .character-slot-title {
     font-weight: 600;
     color: var(--color-dark-purple);
@@ -735,6 +741,30 @@ body.creator-body, body.admin-body {
     display: grid;
     grid-template-columns: 2fr 1fr;
     gap: 15px;
+}
+
+/* Position control styles */
+.position-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.move-up-btn,
+.move-down-btn {
+    min-width: 24px;
+    width: 24px;
+    height: 20px;
+    padding: 0;
+    font-size: 12px;
+    line-height: 1;
+    font-weight: bold;
+}
+
+.move-up-btn:disabled,
+.move-down-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
 }
 
 .controls-wrapper {

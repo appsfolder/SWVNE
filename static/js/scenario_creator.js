@@ -104,6 +104,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Update all dropdowns after all slots are created
         updateAllCharacterDropdowns(slotsContainer);
+        
+        // Update position button states
+        updatePositionButtons(slotsContainer);
     }
     
     function addCharacterSlot(container, charData = null, slotNumber = null) {
@@ -135,6 +138,9 @@ document.addEventListener('DOMContentLoaded', () => {
         charSelect.addEventListener('change', () => {
             updateAllCharacterDropdowns(container);
         });
+        
+        // Set up up/down button event listeners
+        setupPositionButtons(slot, container);
     }
     
     function populateCharacterDropdown(charSelect, container, currentCharId = null) {
@@ -227,9 +233,77 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-
-
-
+    
+    function setupPositionButtons(slot, container) {
+        const moveUpBtn = slot.querySelector('.move-up-btn');
+        const moveDownBtn = slot.querySelector('.move-down-btn');
+        
+        moveUpBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            moveSlotUp(slot, container);
+        });
+        
+        moveDownBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            moveSlotDown(slot, container);
+        });
+    }
+    
+    function moveSlotUp(slot, container) {
+        const previousSlot = slot.previousElementSibling;
+        if (previousSlot) {
+            container.insertBefore(slot, previousSlot);
+            updateSlotNumbers(container);
+            updateCharactersOnScreenFromSlots(container);
+            updatePositionButtons(container);
+        }
+    }
+    
+    function moveSlotDown(slot, container) {
+        const nextSlot = slot.nextElementSibling;
+        if (nextSlot) {
+            container.insertBefore(nextSlot, slot);
+            updateSlotNumbers(container);
+            updateCharactersOnScreenFromSlots(container);
+            updatePositionButtons(container);
+        }
+    }
+    
+    function updatePositionButtons(container) {
+        const slots = container.querySelectorAll('.character-slot');
+        slots.forEach((slot, index) => {
+            const moveUpBtn = slot.querySelector('.move-up-btn');
+            const moveDownBtn = slot.querySelector('.move-down-btn');
+            
+            // Disable up button for first slot
+            moveUpBtn.disabled = (index === 0);
+            // Disable down button for last slot
+            moveDownBtn.disabled = (index === slots.length - 1);
+        });
+    }
+    
+    function updateCharactersOnScreenFromSlots(container) {
+        const card = container.closest('.dialogue-card');
+        const dialogueId = card.dataset.id;
+        const dialogue = scenarioState.dialogues[dialogueId];
+        
+        const charactersOnScreen = [];
+        container.querySelectorAll('.character-slot').forEach(slot => {
+            const charId = slot.querySelector('.character-select').value;
+            if (charId) {
+                charactersOnScreen.push({
+                    id: charId,
+                    pose: slot.querySelector('.pose-select').value || 'neutral'
+                });
+            }
+        });
+        
+        dialogue.characters_on_screen = charactersOnScreen;
+        
+        // Update speaker dropdown to reflect new order
+        populateSpeakerDropdown(card.querySelector('.speaker-select'), charactersOnScreen, dialogue.character);
+    }
+    
     function handleStateUpdate(e) {
         const target = e.target;
         
@@ -375,6 +449,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const card = target.closest('.dialogue-card');
             const slotsContainer = card.querySelector('.characters-slots-container');
             addCharacterSlot(slotsContainer);
+            updatePositionButtons(slotsContainer);
             return;
         }
         
@@ -405,6 +480,9 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Update speaker dropdown
             populateSpeakerDropdown(card.querySelector('.speaker-select'), charactersOnScreen, scenarioState.dialogues[dialogueId].character);
+            
+            // Update position buttons
+            updatePositionButtons(slotsContainer);
             return;
         }
     }

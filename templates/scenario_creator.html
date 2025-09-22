@@ -123,7 +123,13 @@
     <template id="character-slot-template">
         <div class="character-slot">
             <div class="character-slot-header">
-                <span class="character-slot-title">Персонаж <span class="slot-number">1</span></span>
+                <div class="character-slot-left">
+                    <div class="position-controls">
+                        <button class="btn btn--small btn--secondary move-up-btn" type="button" title="Переместить вверх">↑</button>
+                        <button class="btn btn--small btn--secondary move-down-btn" type="button" title="Переместить вниз">↓</button>
+                    </div>
+                    <span class="character-slot-title">Персонаж <span class="slot-number">1</span></span>
+                </div>
                 <button class="btn btn--danger btn--small remove-character-btn" type="button">Удалить</button>
             </div>
             <div class="character-slot-content">
