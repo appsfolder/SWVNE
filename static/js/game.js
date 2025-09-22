@@ -225,6 +225,8 @@ class VisualNovelEngine {
 
     async startGame(scenarioId) {
         this.audioManager.unlockAudio();
+        this.hideChoices();
+        
         const scenario = this.gameData.scenarios[scenarioId];
         if (!scenario || Object.keys(scenario.dialogues).length === 0) {
             alert('Ошибка: Сценарий не найден или пуст!');
@@ -268,6 +270,7 @@ class VisualNovelEngine {
     showMainMenu() {
         this.audioManager.stopBGM(true);
         this.clearScenarioInfoDisplay();
+        this.hideChoices();
         this.showScreen('mainMenu');
     }
 
@@ -457,66 +460,76 @@ class VisualNovelEngine {
             inactiveBg.onerror = null;
         }
     }
-    renderCharacters(charactersOnScreen, speakerId) {
+
+    renderCharacters(charactersOnScreen = [], speakerId) {
         const charactersContainer = document.getElementById('charactersContainer');
+        const existingSprites = new Map();
+        charactersContainer.querySelectorAll('.character-sprite').forEach(sprite => {
+            existingSprites.set(sprite.dataset.charId, sprite);
+        });
         
-        // Clear existing characters
-        charactersContainer.innerHTML = '';
-        
-        if (!charactersOnScreen || charactersOnScreen.length === 0) {
-            return;
+        const newCharIds = new Set(charactersOnScreen.map(c => c.id));
+
+        for (const [charId, sprite] of existingSprites.entries()) {
+            if (!newCharIds.has(charId)) {
+                sprite.classList.add('hidden');
+                setTimeout(() => sprite.remove(), 300);
+                existingSprites.delete(charId);
+            }
         }
-        
+
         const numCharacters = charactersOnScreen.length;
-        
+
         charactersOnScreen.forEach((charInfo, index) => {
             const charData = this.gameData.characters[charInfo.id];
-            if (!charData) {
-                console.warn(`Character data not found for id: ${charInfo.id}`);
-                return;
-            }
-            
+            if (!charData) return;
+
             const pose = charInfo.pose || 'neutral';
-            if (!charData.poses[pose]) {
-                console.warn(`Pose not found: ${charInfo.id}.${pose}`);
-                return;
-            }
+            const posePath = charData.poses[pose];
+            if (!posePath) return;
             
-            // Create character element
-            const charContainer = document.createElement('div');
-            charContainer.className = 'character-sprite';
-            charContainer.id = `character-${charInfo.id}-${index}`;
-            
-            const charImage = document.createElement('img');
-            charImage.src = charData.poses[pose];
-            charImage.alt = charData.name;
-            
-            charContainer.appendChild(charImage);
-            
-            // Calculate position based on number of characters and index
             let leftPosition;
-            if (numCharacters === 1) {
-                leftPosition = 50; // Center
-            } else if (numCharacters === 2) {
-                leftPosition = index === 0 ? 25 : 75; // Left/Right like before
+            if (numCharacters === 1) leftPosition = 50;
+            else if (numCharacters === 2) leftPosition = index === 0 ? 25 : 75;
+            else {
+                const spacing = 80 / (numCharacters - 1);
+                leftPosition = 10 + (index * spacing);
+            }
+
+            let sprite = existingSprites.get(charInfo.id);
+
+            if (sprite) {
+                const img = sprite.querySelector('img');
+                if (img.src !== window.location.origin + posePath) {
+                    img.src = posePath;
+                }
+                sprite.style.left = `${leftPosition}%`;
+                sprite.classList.toggle('active-speaker', charInfo.id === speakerId);
             } else {
-                // Distribute evenly across screen with some padding
-                const spacing = 80 / (numCharacters - 1); // 80% of screen width
-                leftPosition = 10 + (index * spacing); // Start at 10% from left
+                sprite = document.createElement('div');
+                sprite.className = 'character-sprite hidden';
+                sprite.id = `character-sprite-${charInfo.id}`;
+                sprite.dataset.charId = charInfo.id;
+                
+                const charImage = document.createElement('img');
+                charImage.src = posePath;
+                charImage.alt = charData.name;
+                sprite.appendChild(charImage);
+                
+                sprite.style.left = `${leftPosition}%`;
+                sprite.style.transform = 'translateX(-50%)';
+                sprite.classList.toggle('active-speaker', charInfo.id === speakerId);
+                
+                charactersContainer.appendChild(sprite);
+
+                setTimeout(() => {
+                    sprite.classList.remove('hidden');
+                }, 20);
             }
-            
-            // Apply position
-            charContainer.style.left = `${leftPosition}%`;
-            charContainer.style.transform = 'translateX(-50%)';
-            
-            // Handle speaker highlighting
-            if (charInfo.id === speakerId) {
-                charContainer.classList.add('active-speaker');
-            }
-            
-            charactersContainer.appendChild(charContainer);
         });
     }
+
+
     setCharacterName(name, color = '#20c997') { const nameElement = document.getElementById('characterName'); nameElement.textContent = name; nameElement.style.backgroundColor = color; nameElement.classList.remove('hidden'); }
     hideCharacterName() { document.getElementById('characterName').classList.add('hidden'); }
     async typeText(text) { const dialogueTextElement = document.getElementById('dialogueText'); this.isTyping = true; this.currentText = ''; dialogueTextElement.innerHTML = ''; for (let i = 0; i < text.length; i++) { if (!this.isTyping) break; this.currentText += text[i]; dialogueTextElement.innerHTML = this.currentText + '<span class="typing-cursor">|</span>'; await new Promise(resolve => setTimeout(resolve, this.settings.textSpeed)); } this.isTyping = false; dialogueTextElement.innerHTML = text; }

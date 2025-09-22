@@ -21,11 +21,11 @@ A simple, stupid, but fun web-based visual novel engine built with Flask and van
 
 ## Table of Contents / Содержание
 
-- [Installation](#installation) / [Установка](#установка)
-- [Usage](#usage) / [Использование](#использование)
-- [Features](#features) / [Фичи](#фичи)
-- [Content Creation](#content-creation) / [Создание контента](#создание-контента)
-- [License](#license) / [Лицензия](#лицензия)
+- [Installation / Установка](#installation--установка)
+- [Usage / Использование](#usage--использование)
+- [Features / Фичи](#features--фичи)
+- [Content Creation / Создание контента](#content-creation--создание-контента)
+- [License / Лицензия](#license--лицензия)
 
 ## Installation / Установка
 
