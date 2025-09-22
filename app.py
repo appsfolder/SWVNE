@@ -316,9 +316,137 @@ def load_scenario(scenario_id):
     except Exception as e:
         return jsonify({'error': 'Ошибка сервера'}), 500
 
+@app.route('/api/characters/save', methods=['POST'])
+def save_character():
+    """Save character data to file."""
+    # SECURITY: Require admin authentication for character modifications
+    if not check_admin():
+        return jsonify({'success': False, 'error': 'Доступ запрещён'}), 403
+        
+    try:
+        character_data = request.json.get('characters', {})
+        
+        if not character_data:
+            return jsonify({'success': False, 'error': 'Неверные данные персонажа'}), 400
+            
+        character_id = list(character_data.keys())[0]
+        if not character_id:
+            return jsonify({'success': False, 'error': 'ID персонажа не найден'}), 400
+        
+        # SECURITY: Validate character_id to prevent path traversal
+        if not character_id.replace('_', '').replace('-', '').isalnum() or len(character_id) > 50:
+            return jsonify({'success': False, 'error': 'Недопустимые символы в ID персонажа'}), 400
+        
+        # Create characters directory if it doesn't exist
+        characters_dir = os.path.join(content_dir, 'characters')
+        if not os.path.exists(characters_dir):
+            os.makedirs(characters_dir)
+        
+        # Load existing characters
+        chars_file = os.path.join(characters_dir, 'chars.json')
+        existing_data = {'characters': {}}
+        if os.path.exists(chars_file):
+            with open(chars_file, 'r', encoding='utf-8') as f:
+                existing_data = json.load(f)
+        
+        # Update with new character
+        existing_data['characters'].update(character_data)
+        
+        # Save to characters file
+        with open(chars_file, 'w', encoding='utf-8') as f:
+            json.dump(existing_data, f, ensure_ascii=False, indent=2)
+        
+        return jsonify({'success': True, 'message': f'Персонаж "{character_id}" сохранён успешно'})
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': 'Ошибка сервера'}), 500
+
+@app.route('/api/characters/upload-image', methods=['POST'])
+def upload_character_image():
+    """Upload character pose image."""
+    # SECURITY: Require admin authentication for character modifications
+    if not check_admin():
+        return jsonify({'success': False, 'error': 'Доступ запрещён'}), 403
+        
+    try:
+        if 'image' not in request.files:
+            return jsonify({'success': False, 'error': 'Файл не найден'}), 400
+        
+        file = request.files['image']
+        character_id = request.form.get('character_id')
+        pose_name = request.form.get('pose_name')
+        
+        if not character_id or not pose_name:
+            return jsonify({'success': False, 'error': 'Не указан ID персонажа или название позы'}), 400
+        
+        # SECURITY: Validate inputs
+        if not character_id.replace('_', '').replace('-', '').isalnum() or len(character_id) > 50:
+            return jsonify({'success': False, 'error': 'Недопустимые символы в ID персонажа'}), 400
+        
+        if not pose_name.replace('_', '').isalnum() or len(pose_name) > 20:
+            return jsonify({'success': False, 'error': 'Недопустимые символы в названии позы'}), 400
+        
+        if file.filename == '':
+            return jsonify({'success': False, 'error': 'Файл не выбран'}), 400
+        
+        # SECURITY: Validate file extension
+        allowed_extensions = {'png', 'jpg', 'jpeg', 'webp'}
+        file_ext = file.filename.rsplit('.', 1)[1].lower() if '.' in file.filename else ''
+        if file_ext not in allowed_extensions:
+            return jsonify({'success': False, 'error': 'Недопустимый формат файла. Используйте PNG, JPG, JPEG или WEBP'}), 400
+        
+        # Create character images directory
+        safe_character_id = secure_filename(character_id)
+        safe_pose_name = secure_filename(pose_name)
+        
+        character_dir = os.path.join('static', 'character_images', safe_character_id)
+        os.makedirs(character_dir, exist_ok=True)
+        
+        # Save with .png extension for consistency
+        filename = f"{safe_pose_name}.png"
+        filepath = os.path.join(character_dir, filename)
+        
+        # SECURITY: Validate that the path is within the expected directory
+        if not os.path.abspath(filepath).startswith(os.path.abspath(character_dir)):
+            return jsonify({'success': False, 'error': 'Недопустимый путь к файлу'}), 400
+            
+        file.save(filepath)
+        
+        # Return the relative path for the frontend
+        relative_path = f"/static/character_images/{safe_character_id}/{filename}"
+        
+        return jsonify({
+            'success': True, 
+            'message': 'Изображение загружено успешно',
+            'path': relative_path
+        })
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': 'Ошибка сервера'}), 500
+
+@app.route('/api/characters/list')
+def list_characters():
+    """Get list of existing characters."""
+    try:
+        manager = VisualNovelManager(content_dir)
+        characters_list = []
+        
+        for char_id, char_data in manager.characters.items():
+            characters_list.append({
+                'id': char_id,
+                'name': char_data.get('name', char_id),
+                'color': char_data.get('color', '#000000'),
+                'poses': list(char_data.get('poses', {}).keys()) if 'poses' in char_data else []
+            })
+        
+        return jsonify({'characters': characters_list})
+        
+    except Exception as e:
+        return jsonify({'error': 'Ошибка сервера'}), 500
+
 @app.route('/character-creator')
 def character_creator():
-    """Отдает страницу визуального редактора персонажей."""
+    """Отдаёт страницу редактора персонажей."""
     return render_template('character_creator.html')
 
 
