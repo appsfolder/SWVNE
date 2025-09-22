@@ -22,6 +22,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadScenarioSelect = document.getElementById('load-scenario-select');
     const loadScenarioBtn = document.getElementById('load-scenario-btn');
     const newScenarioBtn = document.getElementById('new-scenario-btn');
+    const exportScenarioBtn = document.getElementById('export-scenario-btn');
+    const importScenarioBtn = document.getElementById('import-scenario-btn');
+    const importScenarioInput = document.getElementById('import-scenario-input');
     const cardsContainer = document.getElementById('dialogue-cards-container');
     const cardTemplate = document.getElementById('dialogue-card-template');
     const choiceTemplate = document.getElementById('choice-row-template');
@@ -762,6 +765,102 @@ document.addEventListener('DOMContentLoaded', () => {
             loadScenario(selectedScenario);
         } else {
             notifications.warning('Выбор сценария', 'Пожалуйста, выберите сценарий для загрузки.');
+        }
+    });
+    
+    function exportScenario() {
+        if (!scenarioState.meta.id) {
+            notifications.error('Необходимые данные', 'Пожалуйста, укажите ID сценария перед экспортом!');
+            return;
+        }
+        
+        const finalJson = {
+            scenarios: {
+                [scenarioState.meta.id]: {
+                    title: scenarioState.meta.title,
+                    description: scenarioState.meta.description,
+                    author: scenarioState.meta.author,
+                    start_dialogue: scenarioState.meta.start_dialogue,
+                    dialogues: scenarioState.dialogues
+                }
+            }
+        };
+        
+        const jsonString = JSON.stringify(finalJson, null, 2);
+        const blob = new Blob([jsonString], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${scenarioState.meta.id}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        notifications.success('Экспорт завершён', `Файл ${scenarioState.meta.id}.json скачан успешно`);
+    }
+    
+    function importScenario(file) {
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+            try {
+                const data = JSON.parse(e.target.result);
+                
+                if (!data.scenarios) {
+                    throw new Error('Неверный формат файла. Отсутствует секция "scenarios".');
+                }
+                
+                const scenarioIds = Object.keys(data.scenarios);
+                if (scenarioIds.length === 0) {
+                    throw new Error('Файл не содержит сценариев.');
+                }
+                
+                const scenarioId = scenarioIds[0];
+                const loadedScenario = data.scenarios[scenarioId];
+                if (scenarioState.meta.id || Object.keys(scenarioState.dialogues).length > 1) {
+                    const shouldImport = await notifications.confirm(
+                        'Подтверждение импорта', 
+                        `Импортировать сценарий "${loadedScenario.title || scenarioId}"?\n\nТекущие несохранённые изменения будут потеряны.`
+                    );
+                    
+                    if (!shouldImport) {
+                        return;
+                    }
+                }
+                
+                scenarioState.meta.id = scenarioId;
+                scenarioState.meta.title = loadedScenario.title || '';
+                scenarioState.meta.description = loadedScenario.description || '';
+                scenarioState.meta.author = loadedScenario.author || '';
+                scenarioState.meta.start_dialogue = loadedScenario.start_dialogue || 'start';
+                scenarioState.dialogues = loadedScenario.dialogues || { 'start': { text: '', scene: '' } };
+                
+                renderAll();
+                notifications.success('Импорт завершён', `Сценарий "${loadedScenario.title || scenarioId}" загружен успешно`);
+                
+            } catch (error) {
+                console.error('Import error:', error);
+                notifications.error('Ошибка импорта', error.message);
+            } finally {
+                // Clear the file input
+                importScenarioInput.value = '';
+            }
+        };
+        
+        reader.readAsText(file);
+    }
+    
+    exportScenarioBtn.addEventListener('click', exportScenario);
+    
+    importScenarioBtn.addEventListener('click', () => {
+        importScenarioInput.click();
+    });
+    
+    importScenarioInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            importScenario(file);
         }
     });
     
