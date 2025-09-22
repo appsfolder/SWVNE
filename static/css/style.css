@@ -943,6 +943,30 @@ body.creator-body, body.admin-body {
     margin-top: 25px;
 }
 
+.audio-control-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.audio-control-wrapper select {
+    flex-grow: 1;
+}
+
+.audio-control-wrapper .audio-preview-btn {
+    flex-shrink: 0;
+    width: 42px;
+    padding: 8px 12px;
+}
+
+.audio-preview-btn:disabled {
+    background-color: #ced4da; /* Светло-серый цвет */
+    color: #6c757d; /* Темно-серый текст */
+    cursor: not-allowed; /* Курсор "запрещено" */
+    box-shadow: none;
+    transform: none;
+}
+
 @media (max-width: 768px) {
     .menu-container, .settings-container, .history-container {
         width: 95%;

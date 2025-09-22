@@ -14,6 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const charactersData = JSON.parse(document.getElementById('characters-data').textContent);
     const scenesData = JSON.parse(document.getElementById('scenes-data').textContent);
+    const bgmData = JSON.parse(document.getElementById('bgm-data').textContent);
+    const sfxData = JSON.parse(document.getElementById('sfx-data').textContent);
 
     const addDialogueBtn = document.getElementById('add-dialogue-btn');
     const saveJsonBtn = document.getElementById('save-json-btn');
@@ -21,6 +23,35 @@ document.addEventListener('DOMContentLoaded', () => {
     const cardsContainer = document.getElementById('dialogue-cards-container');
     const cardTemplate = document.getElementById('dialogue-card-template');
     const choiceTemplate = document.getElementById('choice-row-template');
+
+    const previewPlayer = new Audio();
+    let currentPreviewButton = null;
+
+    const resetPreviewButton = () => {
+        if (currentPreviewButton) {
+            currentPreviewButton.textContent = '▶';
+            currentPreviewButton = null;
+        }
+    };
+
+    const updatePreviewButtonState = (selectElement) => {
+        const wrapper = selectElement.closest('.audio-control-wrapper');
+        const button = wrapper.querySelector('.audio-preview-btn');
+        const hasValue = selectElement.value && selectElement.value !== 'stop';
+
+        if (hasValue) {
+            button.disabled = false;
+            button.classList.remove('btn--disabled');
+            button.classList.add('btn--secondary');
+        } else {
+            button.disabled = true;
+            button.classList.remove('btn--secondary');
+            button.classList.add('btn--disabled');
+        }
+    };
+
+    previewPlayer.addEventListener('pause', resetPreviewButton);
+    previewPlayer.addEventListener('ended', resetPreviewButton);
 
     function renderAll() {
         document.getElementById('scenario-id').value = scenarioState.meta.id || '';
@@ -76,14 +107,29 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        card.querySelector('.bgm-input').value = data.bgm || '';
-        card.querySelector('.sfx-input').value = data.sfx || '';
-
         // Handle condition input if it exists (from variables system)
         const conditionInput = card.querySelector('.dialogue-condition-input');
         if (conditionInput) {
             conditionInput.value = data.condition || '';
         }
+
+        const bgmSelect = card.querySelector('.bgm-select');
+        bgmData.forEach(path => {
+            const fileName = path.split('/').pop();
+            const option = new Option(fileName, path);
+            bgmSelect.appendChild(option);
+        });
+        bgmSelect.value = data.bgm || '';
+        updatePreviewButtonState(bgmSelect);
+
+        const sfxSelect = card.querySelector('.sfx-select');
+        sfxData.forEach(path => {
+            const fileName = path.split('/').pop();
+            const option = new Option(fileName, path);
+            sfxSelect.appendChild(option);
+        });
+        sfxSelect.value = data.sfx || '';
+        updatePreviewButtonState(sfxSelect);
 
         return card;
     }
@@ -231,11 +277,18 @@ document.addEventListener('DOMContentLoaded', () => {
         
         allSelects.forEach(select => {
             const currentValue = select.value;
-            select.innerHTML = `<option value="">-- Конец ветки --</option>`;
+            select.innerHTML = '';
+
+            if (select.classList.contains('next-if-false-select')) {
+                select.add(new Option("-- Перейти к 'ID Следующей реплики' --", ""));
+            } else {
+                select.add(new Option("-- Не выбрано --", ""));
+            }
+
             dialogueIds.forEach(id => {
-                const option = new Option(id, id);
-                select.appendChild(option);
+                select.add(new Option(id, id));
             });
+
             if (dialogueIds.includes(currentValue) || currentValue === '') {
                 select.value = currentValue;
             } else {
@@ -254,11 +307,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (nextIfFalseSelect) {
                     nextIfFalseSelect.value = cardData.next_if_false || '';
                 }
-                
                 card.querySelectorAll('.choice-row').forEach((row, index) => {
-                   if(cardData.choices && cardData.choices[index]) {
-                       row.querySelector('.choice-next-select').value = cardData.choices[index].next || '';
-                   }
+                if(cardData.choices && cardData.choices[index]) {
+                    row.querySelector('.choice-next-select').value = cardData.choices[index].next || '';
+                }
                 });
             }
         });
@@ -389,8 +441,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (target.classList.contains('speaker-select')) dialogue.character = target.value || null;
         if (target.classList.contains('next-dialogue-select')) dialogue.next = target.value || null;
         if (target.classList.contains('scene-select')) dialogue.scene = target.value || undefined;
-        if (target.classList.contains('bgm-input')) dialogue.bgm = target.value || undefined;
-        if (target.classList.contains('sfx-input')) dialogue.sfx = target.value || undefined;
+        if (target.classList.contains('bgm-select')) { dialogue.bgm = target.value || undefined; updatePreviewButtonState(target); }
+        if (target.classList.contains('sfx-select')) { dialogue.sfx = target.value || undefined; updatePreviewButtonState(target); }
         if (target.classList.contains('dialogue-condition-input')) dialogue.condition = target.value || undefined;
         if (target.classList.contains('next-if-false-select')) dialogue.next_if_false = target.value || undefined;
         
@@ -462,6 +514,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handleClicks(e) {
         const target = e.target;
+
+        if (target.classList.contains('audio-preview-btn')) {
+            e.preventDefault();
+            const wrapper = target.closest('.audio-control-wrapper');
+            const select = wrapper.querySelector('select');
+            const selectedAudio = select.value;
+
+            if (target === currentPreviewButton && !previewPlayer.paused) {
+                previewPlayer.pause();
+                return;
+            }
+
+            previewPlayer.pause();
+
+            if (selectedAudio && selectedAudio !== 'stop') {
+                previewPlayer.src = selectedAudio;
+                previewPlayer.play();
+                currentPreviewButton = target;
+                target.textContent = '❚❚';
+            }
+            return;
+        }
 
         if (target.classList.contains('remove-dialogue-btn')) {
             const dialogueCard = target.closest('.dialogue-card');
