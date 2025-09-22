@@ -135,6 +135,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 slot.classList.add('filled');
                 status.className = 'pose-status success';
                 status.textContent = 'Загружено';
+            } else if (result.requires_auth) {
+                // Authentication required - prompt for login
+                const authenticated = await auth.ensureAuthenticated();
+                if (authenticated) {
+                    // Retry the upload
+                    handleFileUpload(e, key);
+                    return;
+                } else {
+                    throw new Error('Авторизация отменена');
+                }
             } else {
                 throw new Error(result.error || 'Ошибка загрузки');
             }
@@ -195,6 +205,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (result.success) {
                 notifications.success('Успешно', result.message);
                 await loadCharactersList();
+            } else if (result.requires_auth) {
+                // Authentication required - prompt for login
+                const authenticated = await auth.ensureAuthenticated();
+                if (authenticated) {
+                    // Retry the save operation
+                    await saveCharacter();
+                    return;
+                }
             } else {
                 notifications.error('Ошибка сохранения', result.error);
             }

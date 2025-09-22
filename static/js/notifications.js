@@ -227,3 +227,153 @@ window.customConfirm = (message) => {
     
     return notifications.confirm(title, body);
 };
+
+// Authentication Helper
+class AuthManager {
+    constructor() {
+        this.isAuthenticated = false;
+        this.checkAuthStatus();
+    }
+
+    // Check current authentication status
+    async checkAuthStatus() {
+        try {
+            const response = await fetch('/api/auth/status');
+            const result = await response.json();
+            this.isAuthenticated = result.authenticated;
+            return this.isAuthenticated;
+        } catch (error) {
+            console.error('Error checking auth status:', error);
+            this.isAuthenticated = false;
+            return false;
+        }
+    }
+
+    // Show login modal and attempt authentication
+    async promptLogin() {
+        return new Promise((resolve) => {
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay';
+            overlay.innerHTML = `
+                <div class="modal">
+                    <div class="modal-header">
+                        <div class="modal-title">
+                            <div class="modal-icon info">🔐</div>
+                            Требуется авторизация
+                        </div>
+                    </div>
+                    <div class="modal-body">
+                        <p>Для выполнения этого действия необходимо войти как администратор.</p>
+                        <div class="form-group" style="margin-top: 20px;">
+                            <label for="admin-password">Пароль администратора:</label>
+                            <input type="password" id="admin-password" class="form-control" style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 4px;" placeholder="Введите пароль">
+                        </div>
+                        <div id="login-error" style="color: #dc3545; margin-top: 10px; display: none;"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="modal-button secondary" data-action="cancel">Отмена</button>
+                        <button class="modal-button primary" data-action="login">Войти</button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(overlay);
+
+            const passwordInput = overlay.querySelector('#admin-password');
+            const errorDiv = overlay.querySelector('#login-error');
+            const loginBtn = overlay.querySelector('[data-action="login"]');
+            const cancelBtn = overlay.querySelector('[data-action="cancel"]');
+
+            const closeModal = () => {
+                overlay.classList.remove('show');
+                setTimeout(() => overlay.remove(), 300);
+            };
+
+            const attemptLogin = async () => {
+                const password = passwordInput.value;
+                if (!password) {
+                    errorDiv.textContent = 'Введите пароль';
+                    errorDiv.style.display = 'block';
+                    return;
+                }
+
+                loginBtn.disabled = true;
+                loginBtn.textContent = 'Вход...';
+                errorDiv.style.display = 'none';
+
+                try {
+                    const response = await fetch('/api/auth/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ password })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        this.isAuthenticated = true;
+                        notifications.success('Авторизация', result.message);
+                        closeModal();
+                        resolve(true);
+                    } else {
+                        errorDiv.textContent = result.error;
+                        errorDiv.style.display = 'block';
+                        loginBtn.disabled = false;
+                        loginBtn.textContent = 'Войти';
+                        passwordInput.focus();
+                        passwordInput.select();
+                    }
+                } catch (error) {
+                    errorDiv.textContent = 'Ошибка сервера. Попробуйте снова.';
+                    errorDiv.style.display = 'block';
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = 'Войти';
+                }
+            };
+
+            // Event listeners
+            loginBtn.addEventListener('click', attemptLogin);
+            cancelBtn.addEventListener('click', () => {
+                closeModal();
+                resolve(false);
+            });
+
+            // Enter key to login
+            passwordInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    attemptLogin();
+                }
+            });
+
+            // Escape key to cancel
+            const escapeHandler = (e) => {
+                if (e.key === 'Escape') {
+                    closeModal();
+                    document.removeEventListener('keydown', escapeHandler);
+                    resolve(false);
+                }
+            };
+            document.addEventListener('keydown', escapeHandler);
+
+            // Show modal and focus password input
+            setTimeout(() => {
+                overlay.classList.add('show');
+                passwordInput.focus();
+            }, 10);
+        });
+    }
+
+    // Check auth and prompt login if needed
+    async ensureAuthenticated() {
+        const isAuth = await this.checkAuthStatus();
+        if (isAuth) {
+            return true;
+        }
+        return await this.promptLogin();
+    }
+}
+
+// Create global auth manager
+const auth = new AuthManager();

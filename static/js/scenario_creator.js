@@ -660,6 +660,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (result.success) {
                 notifications.success('Успешно', result.message);
                 await loadScenariosList();
+            } else if (result.requires_auth) {
+                // Authentication required - prompt for login
+                const authenticated = await auth.ensureAuthenticated();
+                if (authenticated) {
+                    // Retry the save operation
+                    await saveScenario();
+                    return;
+                }
             } else {
                 notifications.error('Ошибка сохранения', result.error);
             }
