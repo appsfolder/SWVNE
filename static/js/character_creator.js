@@ -16,7 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
         poses: {}
     };
 
-    // DOM elements
     const poseGrid = document.getElementById('pose-grid');
     const idInput = document.getElementById('char-id');
     const nameInput = document.getElementById('char-name');
@@ -32,7 +31,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const progressFill = document.getElementById('progress-fill');
     const progressText = document.getElementById('progress-text');
 
-    // Initialize pose slots
     function initializePoseSlots() {
         poseGrid.innerHTML = '';
         poseKeys.forEach(key => {
@@ -51,7 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
             poseGrid.insertAdjacentHTML('beforeend', slotHTML);
         });
 
-        // Add click handlers for upload buttons
         document.querySelectorAll('.upload-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const pose = btn.dataset.pose;
@@ -59,7 +56,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // Add file input handlers
         poseKeys.forEach(key => {
             document.getElementById(`file-${key}`).addEventListener('change', (e) => {
                 handleFileUpload(e, key);
@@ -67,7 +63,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Sanitize character ID
     function sanitizeId(value) {
         if (!value) return '';
         return value.toLowerCase()
@@ -75,14 +70,12 @@ document.addEventListener('DOMContentLoaded', () => {
             .replace(/[^a-z0-9_]/g, '');
     }
 
-    // Update character state
     function updateCharacterState() {
         characterState.id = sanitizeId(idInput.value);
         characterState.name = nameInput.value;
         characterState.color = colorInput.value;
     }
 
-    // Handle file upload
     async function handleFileUpload(e, key) {
         const file = e.target.files[0];
         if (!file) return;
@@ -101,14 +94,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const status = document.getElementById(`status-${key}`);
         const uploadBtn = slot.querySelector('.upload-btn');
 
-        // Show uploading state
         slot.classList.add('uploading');
         uploadBtn.disabled = true;
         status.style.display = 'block';
         status.className = 'pose-status uploading';
         status.textContent = 'Загрузка...';
 
-        // Show preview immediately
         const wrapper = document.getElementById(`wrapper-${key}`);
         const reader = new FileReader();
         reader.onload = (event) => {
@@ -119,7 +110,6 @@ document.addEventListener('DOMContentLoaded', () => {
         reader.readAsDataURL(file);
 
         try {
-            // Upload to server
             const formData = new FormData();
             formData.append('image', file);
             formData.append('character_id', characterState.id);
@@ -139,10 +129,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 status.className = 'pose-status success';
                 status.textContent = 'Загружено';
             } else if (result.requires_auth) {
-                // Authentication required - prompt for login
                 const authenticated = await auth.ensureAuthenticated();
                 if (authenticated) {
-                    // Retry the upload
                     handleFileUpload(e, key);
                     return;
                 } else {
@@ -164,7 +152,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Save character to server
     async function saveCharacter() {
         updateCharacterState();
 
@@ -209,10 +196,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 notifications.success('Успешно', result.message);
                 await loadCharactersList();
             } else if (result.requires_auth) {
-                // Authentication required - prompt for login
                 const authenticated = await auth.ensureAuthenticated();
                 if (authenticated) {
-                    // Retry the save operation
                     await saveCharacter();
                     return;
                 }
@@ -227,7 +212,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Load characters list
     async function loadCharactersList() {
         try {
             const response = await fetch('/api/characters/list');
@@ -249,7 +233,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Load character
     async function loadCharacter(characterId) {
         try {
             showProgress('Загрузка персонажа...');
@@ -260,12 +243,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (characters[characterId]) {
                 const char = characters[characterId];
                 
-                // Update form
                 idInput.value = characterId;
                 nameInput.value = char.name || '';
                 colorInput.value = char.color || '#20c997';
                 
-                // Update state
                 characterState = {
                     id: characterId,
                     name: char.name || '',
@@ -273,7 +254,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     poses: char.poses || {}
                 };
                 
-                // Update pose previews
                 poseKeys.forEach(key => {
                     const slot = document.getElementById(`slot-${key}`);
                     const preview = document.getElementById(`preview-${key}`);
@@ -309,16 +289,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Create new character
     async function createNewCharacter() {
         const shouldCreate = await notifications.confirm('Новый персонаж', 'Создать нового персонажа?\n\nНесохранённые изменения будут потеряны.');
         if (shouldCreate) {
-            // Reset form
             idInput.value = '';
             nameInput.value = '';
             colorInput.value = '#20c997';
             
-            // Reset state
             characterState = {
                 id: '',
                 name: '',
@@ -326,7 +303,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 poses: {}
             };
             
-            // Reset pose slots
             poseKeys.forEach(key => {
                 const slot = document.getElementById(`slot-${key}`);
                 const preview = document.getElementById(`preview-${key}`);
@@ -344,18 +320,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Show progress
     function showProgress(message) {
         progressText.textContent = message;
         progressDiv.style.display = 'block';
     }
 
-    // Hide progress
     function hideProgress() {
         progressDiv.style.display = 'none';
     }
 
-    // Event listeners
     idInput.addEventListener('input', () => {
         const sanitized = sanitizeId(idInput.value);
         if (idInput.value !== sanitized) {
@@ -513,7 +486,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     newBtn.addEventListener('click', createNewCharacter);
 
-    // Initialize
     initializePoseSlots();
     loadCharactersList();
 });

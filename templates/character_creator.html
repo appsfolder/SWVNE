@@ -17,20 +17,27 @@
         </div>
 
         <div class="creator-card controls-card">
-            <div class="creator-card-content">
+            <div class="creator-card-header">
                 <h3>Управление персонажами</h3>
-                <div class="controls-wrapper">
+            </div>
+            <div class="controls-grid">
+                <div class="control-group">
+                    <h4>Основные действия</h4>
                     <button class="btn btn--primary" id="save-character-btn">Сохранить персонажа</button>
-                    <select id="load-character-select" class="form-control" style="min-width: 200px;">
-                        <option value="">-- Загрузить персонажа --</option>
-                    </select>
-                    <button class="btn btn--secondary" id="load-character-btn">Загрузить</button>
                     <button class="btn btn--secondary" id="new-character-btn">Новый персонаж</button>
                 </div>
-                <div class="controls-wrapper" style="margin-top: 10px; gap: 10px;">
-                    <button class="btn btn--secondary" id="export-character-btn">Скачать персонажа</button>
+                <div class="control-group">
+                    <h4>Загрузка существующего</h4>
+                    <select id="load-character-select" class="form-control">
+                        <option value="">-- Выберите персонажа --</option>
+                    </select>
+                    <button class="btn btn--secondary" id="load-character-btn">Загрузить</button>
+                </div>
+                <div class="control-group">
+                    <h4>Файловые операции</h4>
+                    <button class="btn btn--secondary" id="export-character-btn">Скачать (.json)</button>
                     <input type="file" id="import-character-input" accept=".json" style="display: none;">
-                    <button class="btn btn--secondary" id="import-character-btn">Импортировать персонажа</button>
+                    <button class="btn btn--secondary" id="import-character-btn">Импортировать (.json)</button>
                 </div>
             </div>
         </div>

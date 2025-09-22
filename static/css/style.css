@@ -569,26 +569,43 @@ body.creator-body, body.admin-body {
     font-size: var(--font-size-small);
 }
 
+.form-control,
 .form-group input[type="text"],
-.form-group select,
 .form-group textarea,
 .choice-row input[type="text"],
 .choice-row select {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    padding: 10px 15px;
+    border: 2px solid #dfe4ea;
+    border-radius: 8px;
     font-size: var(--font-size-medium);
-    transition: border-color 0.2s ease;
+    background-color: var(--color-white);
+    color: var(--color-dark-blue);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
 }
 
+.form-control:focus,
 .form-group input[type="text"]:focus,
-.form-group select:focus,
 .form-group textarea:focus,
 .choice-row input[type="text"]:focus,
 .choice-row select:focus {
     border-color: var(--color-sea-blue);
     outline: none;
+    box-shadow: 0 0 0 3px rgba(70, 130, 180, 0.2);
+}
+
+select.form-control,
+.form-group select,
+.choice-row select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%236c757d' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 16px 12px;
+    padding-right: 3rem;
+    cursor: pointer;
 }
 
 .remove-btn {
@@ -1110,7 +1127,6 @@ body.creator-body, body.admin-body {
     transform: translateY(-1px);
 }
 
-/* Toast Notifications */
 .toast-container {
     position: fixed;
     top: 20px;
@@ -1473,6 +1489,53 @@ body.creator-body, body.admin-body {
 
 .pose-slot .file-input-label {
     padding: 8px 12px;
+}
+
+.controls-card {
+    padding: 0;
+    overflow: hidden;
+}
+
+.controls-card .creator-card-header {
+    padding: 20px;
+}
+
+.controls-card .creator-card-header h3 {
+    margin: 0;
+}
+
+.controls-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 0;
+    background-color: #f8f9fa;
+    border-top: 1px solid #e0e0e0;
+}
+
+.control-group {
+    padding: 20px;
+    background-color: var(--color-white);
+    border-right: 1px solid #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.control-group:last-child {
+    border-right: none;
+}
+
+.control-group h4 {
+    margin: 0 0 10px 0;
+    font-size: var(--font-size-large);
+    color: var(--color-dark-purple);
+    font-weight: 600;
+}
+
+.control-group .btn,
+.control-group .form-control {
+    width: 100%;
+    margin: 0;
 }
 
 @media (max-width: 768px) {

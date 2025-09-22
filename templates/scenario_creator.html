@@ -11,25 +11,33 @@
         <div class="creator-header">
             <h1>Редактор сценариев</h1>
             <div>
+                <a href="/character-creator" class="btn btn--primary">Редактор персонажей</a>
                 <a href="/" class="btn btn--secondary">Главное меню</a>
             </div>
         </div>
 
         <div class="creator-card controls-card">
-            <div class="creator-card-content">
+            <div class="creator-card-header">
                 <h3>Управление сценарием</h3>
-                <div class="controls-wrapper">
+            </div>
+            <div class="controls-grid">
+                <div class="control-group">
+                    <h4>Основные действия</h4>
                     <button class="btn btn--primary" id="save-scenario-btn">Сохранить сценарий</button>
-                    <select id="load-scenario-select" class="form-control" style="min-width: 200px;">
-                        <option value="">-- Загрузить сценарий --</option>
-                    </select>
-                    <button class="btn btn--secondary" id="load-scenario-btn">Загрузить</button>
                     <button class="btn btn--secondary" id="new-scenario-btn">Новый сценарий</button>
                 </div>
-                <div class="controls-wrapper" style="margin-top: 10px; gap: 10px;">
-                    <button class="btn btn--secondary" id="export-scenario-btn">Скачать сценарий</button>
+                <div class="control-group">
+                    <h4>Загрузка существующего</h4>
+                    <select id="load-scenario-select" class="form-control">
+                        <option value="">-- Выберите сценарий --</option>
+                    </select>
+                    <button class="btn btn--secondary" id="load-scenario-btn">Загрузить</button>
+                </div>
+                <div class="control-group">
+                    <h4>Файловые операции</h4>
+                    <button class="btn btn--secondary" id="export-scenario-btn">Скачать (.json)</button>
                     <input type="file" id="import-scenario-input" accept=".json" style="display: none;">
-                    <button class="btn btn--secondary" id="import-scenario-btn">Импортировать сценарий</button>
+                    <button class="btn btn--secondary" id="import-scenario-btn">Импортировать (.json)</button>
                 </div>
             </div>
         </div>
@@ -40,19 +48,19 @@
             <div class="grid">
                 <div class="form-group">
                     <label for="scenario-id">ID Сценария</label>
-                    <input type="text" id="scenario-id" placeholder="my_scenario">
+                    <input type="text" id="scenario-id" placeholder="my_scenario" class="form-control">
                 </div>
                 <div class="form-group">
                     <label for="scenario-title">Название</label>
-                    <input type="text" id="scenario-title" placeholder="Название истории">
+                    <input type="text" id="scenario-title" placeholder="Название истории" class="form-control"> 
                 </div>
                 <div class="form-group">
                     <label for="scenario-description">Описание</label>
-                    <input type="text" id="scenario-description" placeholder="Краткое описание сюжета">
+                    <input type="text" id="scenario-description" placeholder="Краткое описание сюжета" class="form-control"> 
                 </div>
                  <div class="form-group">
                     <label for="scenario-author">Автор</label>
-                    <input type="text" id="scenario-author" placeholder="Ваш никнейм">
+                    <input type="text" id="scenario-author" placeholder="Ваш никнейм" class="form-control"> 
                 </div>
             </div>
         </div>
@@ -65,38 +73,38 @@
     </div>
 
     <template id="dialogue-card-template">
-        <div class="card dialogue-card">
+        <div class="dialogue-card creator-card"> 
             <button class="btn btn--danger btn--small remove-dialogue-btn">Удалить</button>
             <h3>Реплика: <span class="dialogue-id-display"></span></h3>
             <br>
             <div class="grid">
                 <div class="form-group">
                     <label>ID Реплики (латиница)</label>
-                    <input type="text" class="dialogue-id-input" placeholder="replic_id">
+                    <input type="text" class="dialogue-id-input form-control" placeholder="replic_id"> 
                 </div>
                 <div class="form-group">
                     <label>Фон (Сцена)</label>
-                    <select class="scene-select"><option value="">-- Не менять --</option></select>
+                    <select class="scene-select form-control"><option value="">-- Не менять --</option></select> 
                 </div>
                 <div class="form-group">
                     <label>Говорящий персонаж</label>
-                    <select class="speaker-select"><option value="">-- Рассказчик --</option></select>
+                    <select class="speaker-select form-control"><option value="">-- Рассказчик --</option></select> 
                 </div>
                 <div class="form-group">
                     <label>ID Следующей реплики</label>
-                    <select class="next-dialogue-select"><option value="">-- Не выбрано --</option></select>
+                    <select class="next-dialogue-select form-control"><option value="">-- Не выбрано --</option></select> 
                 </div>
             </div>
             <div class="form-group">
                 <label>Текст реплики</label>
-                <textarea class="dialogue-text-input" rows="3"></textarea>
+                <textarea class="dialogue-text-input form-control" rows="3"></textarea> 
                 <div class="form-group" style="margin-top: 15px;">
                     <label>Условие показа реплики (например, trust > 5)</label>
-                    <input type="text" class="dialogue-condition-input" placeholder="sample_variable == true">
+                    <input type="text" class="dialogue-condition-input form-control" placeholder="sample_variable == true">
                 </div>
                 <div class="form-group">
                     <label>ID реплики, если условие НЕ выполнено</label>
-                    <select class="next-if-false-select"><option value="">-- Перейти к 'ID Следующей реплики' --</option></select>
+                    <select class="next-if-false-select form-control"><option value="">-- Перейти к 'ID Следующей реплики' --</option></select> 
                 </div>
             </div>
             
@@ -106,7 +114,6 @@
                     <button class="btn btn--small btn--secondary add-character-btn" type="button">Добавить персонажа</button>
                 </div>
                 <div class="characters-slots-container">
-                    <!-- Character slots will be dynamically added here -->
                 </div>
             </div>
 
@@ -116,7 +123,7 @@
                 <div class="form-group">
                     <label>Фоновая музыка (BGM)</label>
                     <div class="audio-control-wrapper">
-                        <select class="bgm-select">
+                        <select class="bgm-select form-control"> 
                             <option value="">-- Не менять --</option>
                             <option value="stop">-- Остановить музыку --</option>
                         </select>
@@ -126,7 +133,7 @@
                 <div class="form-group">
                     <label>Звуковой эффект (SFX)</label>
                     <div class="audio-control-wrapper">
-                        <select class="sfx-select">
+                        <select class="sfx-select form-control"> 
                             <option value="">-- Нет --</option>
                         </select>
                         <button type="button" class="btn audio-preview-btn" data-type="bgm">▶</button>
@@ -143,13 +150,13 @@
     <template id="choice-row-template">
         <div class="choice-row" style="display: flex; gap: 10px; align-items: center; margin-bottom: 5px;">
             <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 5px;">
-                <input type="text" class="choice-text-input" placeholder="Текст выбора">
+                <input type="text" class="choice-text-input form-control" placeholder="Текст выбора"> 
                 <div style="display: flex; gap: 10px;">
-                    <input type="text" class="choice-condition-input" placeholder="Условие (например, has_key == true)" style="width: 50%;">
-                    <input type="text" class="choice-set-input" placeholder="Переменные (например, trust=+1, key=false)" style="width: 50%;">
+                    <input type="text" class="choice-condition-input form-control" placeholder="Условие (например, has_key == true)" style="width: 50%;"> <!-- ИСПРАВЛЕНО: Добавлен класс -->
+                    <input type="text" class="choice-set-input form-control" placeholder="Переменные (например, trust=+1, key=false)" style="width: 50%;"> <!-- ИСПРАВЛЕНО: Добавлен класс -->
                 </div>
             </div>
-            <select class="choice-next-select" style="width: 200px;"></select>
+            <select class="choice-next-select form-control" style="width: 200px; flex-shrink: 0;"></select>
             <span class="remove-btn" title="Удалить выбор">✖</span>
         </div>
     </template>
@@ -169,11 +176,11 @@
             <div class="character-slot-content">
                 <div class="form-group">
                     <label>Персонаж</label>
-                    <select class="character-select"><option value="">-- Нет --</option></select>
+                    <select class="character-select form-control"><option value="">-- Нет --</option></select> 
                 </div>
                 <div class="form-group">
                     <label>Поза</label>
-                    <select class="pose-select"></select>
+                    <select class="pose-select form-control"></select> 
                 </div>
             </div>
         </div>
