@@ -767,6 +767,207 @@ body.creator-body, body.admin-body {
     cursor: not-allowed;
 }
 
+/* Character Creator Styles */
+.pose-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin-top: 20px;
+}
+
+.pose-slot {
+    background: var(--color-white);
+    border: 2px dashed #e0e0e0;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+    min-height: 350px;
+    max-height: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    overflow: hidden;
+}
+
+.pose-slot:hover {
+    border-color: var(--color-teal);
+    background-color: rgba(32, 201, 151, 0.02);
+}
+
+.pose-slot.filled {
+    border-style: solid;
+    border-color: var(--color-teal);
+    background-color: rgba(32, 201, 151, 0.05);
+}
+
+.pose-slot.uploading {
+    border-color: var(--color-yellow);
+    background-color: rgba(255, 193, 7, 0.1);
+}
+
+.pose-placeholder {
+    width: 150px;
+    height: 200px;
+    background: #f8f9fa;
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+}
+
+.pose-placeholder::before {
+    content: '+';
+    font-size: 2rem;
+    color: #6c757d;
+    font-weight: bold;
+}
+
+.pose-slot:hover .pose-placeholder {
+    border-color: var(--color-teal);
+    background-color: rgba(32, 201, 151, 0.1);
+}
+
+.pose-slot:hover .pose-placeholder::before {
+    color: var(--color-teal);
+}
+
+.pose-image-wrapper {
+    width: 150px;
+    height: 200px;
+    overflow: hidden;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    background: #f8f9fa;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.pose-preview {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    border-radius: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+.pose-label {
+    font-weight: bold;
+    color: var(--color-dark-purple);
+    margin-bottom: 10px;
+    font-size: var(--font-size-large);
+    text-transform: capitalize;
+}
+
+.file-input-hidden {
+    display: none;
+}
+
+.upload-btn {
+    background: var(--color-teal);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: var(--font-size-base);
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+}
+
+.upload-btn:hover {
+    background: var(--color-teal-dark);
+}
+
+.upload-btn:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.pose-status {
+    font-size: var(--font-size-small);
+    margin-top: 10px;
+    padding: 5px 10px;
+    border-radius: 4px;
+}
+
+.pose-status.success {
+    background: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+}
+
+.pose-status.error {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+}
+
+.pose-status.uploading {
+    background: rgba(255, 193, 7, 0.1);
+    color: #ffc107;
+}
+
+.char-color-input {
+    width: 60px;
+    height: 40px;
+    border: 2px solid #dee2e6;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+.char-color-input:hover {
+    border-color: var(--color-teal);
+}
+
+/* Upload Progress */
+.upload-progress {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    z-index: 1000;
+    min-width: 300px;
+    text-align: center;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--color-teal);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+    width: 0%;
+}
+
+.progress-text {
+    font-weight: 500;
+    color: var(--color-dark-purple);
+}
+
 .controls-wrapper {
     display: flex;
     justify-content: flex-end;
