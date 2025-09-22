@@ -3,20 +3,20 @@
     "adam": {
       "name": "Адам",
       "color": "#d1b380",
-      "voice": "",
+      "voice": "Orus",
       "poses": {
-        "neutral": "/static/character_images/adam/neutral.png",
-        "happy": "/static/character_images/adam/happy.png",
-        "sad": "/static/character_images/adam/sad.png",
         "angry": "/static/character_images/adam/angry.png",
-        "shy": "/static/character_images/adam/shy.png",
-        "curious": "/static/character_images/adam/curious.png"
+        "curious": "/static/character_images/adam/curious.png",
+        "happy": "/static/character_images/adam/happy.png",
+        "neutral": "/static/character_images/adam/neutral.png",
+        "sad": "/static/character_images/adam/sad.png",
+        "shy": "/static/character_images/adam/shy.png"
       }
     },
     "feixiao": {
       "name": "Фэйсяо",
       "color": "#78cfb5",
-      "voice": "",
+      "voice": "Aoede",
       "poses": {
         "neutral": "/static/character_images/feixiao/neutral.png",
         "happy": "/static/character_images/feixiao/happy.png",
@@ -42,7 +42,7 @@
     "vadim_gefnider": {
       "name": "Вадим Гефнидер",
       "color": "#787fdd",
-      "voice": "",
+      "voice": "Fenrir",
       "poses": {
         "neutral": "/static/character_images/vadim_gefnider/neutral.png",
         "happy": "/static/character_images/vadim_gefnider/happy.png",

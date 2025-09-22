@@ -24,8 +24,7 @@
           ],
           "character": "adam",
           "text": "Хм-м... Купить двухсотик про на межятеке или не купить.",
-          "next": "feixiao_enters",
-          "sfx": "/static/audio/sfx/hmm.mp3"
+          "next": "feixiao_enters"
         },
         "feixiao_enters": {
           "scene": "baku",
@@ -60,9 +59,8 @@
             }
           ],
           "character": "adam",
-          "text": "Ээ не я кулер купил мне теперь двухсотик прошка не нужен!",
-          "next": "feixiao_worried",
-          "sfx": "/static/audio/sfx/rizz.mp3"
+          "text": "Ээ не, я кулер купил мне теперь двухсотик прошка не нужен!",
+          "next": "feixiao_worried"
         },
         "feixiao_worried": {
           "scene": "baku",
@@ -79,9 +77,8 @@
             }
           ],
           "character": "feixiao",
-          "text": "Адам, Посмотри на себя, что ты делаешь? Задумайся...",
-          "next": "adam_choice",
-          "sfx": "/static/audio/sfx/punch.mp3"
+          "text": "Адам, посмотри на себя, что ты делаешь? Задумайся...",
+          "next": "adam_choice"
         },
         "adam_choice": {
           "scene": "baku",
@@ -134,8 +131,7 @@
           ],
           "character": "feixiao",
           "text": "Давай наконец съебем из этого Баку!",
-          "next": "end_demo",
-          "sfx": "/static/audio/sfx/victory.mp3"
+          "next": "end_demo"
         },
         "stay_play": {
           "scene": "baku",
@@ -153,16 +149,14 @@
           ],
           "character": "feixiao",
           "text": "Хорошо... Я подожду тебя в аэропорту. Только не гунь на виво слишком долго, пожалуйста.",
-          "next": "end_demo",
-          "sfx": "/static/audio/sfx/roblox-oof.mp3"
+          "next": "end_demo"
         },
         "end_demo": {
           "scene": "baku",
           "characters_on_screen": [],
           "character": null,
           "text": "Это финал короткой демо-истории... Кто знает, что нас ждет в будущем?",
-          "bgm": "stop",
-          "sfx": "/static/audio/sfx/metal-pipe.mp3"
+          "bgm": "stop"
         }
       }
     }

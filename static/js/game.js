@@ -2,6 +2,7 @@ class AudioManager {
     constructor() {
         this.bgmPlayer = document.getElementById('bgmPlayer');
         this.sfxPlayer = document.getElementById('sfxPlayer');
+        this.voicePlayer = document.getElementById('voicePlayer');
         this.currentBGM = '';
         this.volume = 0.5;
         this.fadeInterval = null;
@@ -75,6 +76,19 @@ class AudioManager {
     playSFX(src) {
         this.sfxPlayer.src = src;
         this.sfxPlayer.play().catch(e => console.error("SFX play failed:", e));
+    }
+
+    playVoice(src) {
+        this.voicePlayer.src = src;
+        this.voicePlayer.play().catch(e => {});
+    }
+
+    stopVoice() {
+        if (!this.voicePlayer.paused) {
+            this.voicePlayer.pause();
+            this.voicePlayer.currentTime = 0;
+            this.voicePlayer.src = '';
+        }
     }
 
     setVolume(value) {
@@ -226,7 +240,7 @@ class VisualNovelEngine {
     async startGame(scenarioId) {
         this.audioManager.unlockAudio();
         this.hideChoices();
-        
+
         const scenario = this.gameData.scenarios[scenarioId];
         if (!scenario || Object.keys(scenario.dialogues).length === 0) {
             alert('Ошибка: Сценарий не найден или пуст!');
@@ -269,6 +283,7 @@ class VisualNovelEngine {
 
     showMainMenu() {
         this.audioManager.stopBGM(true);
+        this.audioManager.stopVoice();
         this.clearScenarioInfoDisplay();
         this.hideChoices();
         this.showScreen('mainMenu');
@@ -330,6 +345,8 @@ class VisualNovelEngine {
         let dialogue = null;
         let protection = 0;
 
+        this.audioManager.stopVoice();
+
         while (protection < 100) {
             const scenario = this.gameData.scenarios[this.gameState.currentScenario];
             if (!scenario) { console.error('Scenario not found'); return; }
@@ -355,6 +372,9 @@ class VisualNovelEngine {
         if (dialogue.sfx) {
             this.audioManager.playSFX(dialogue.sfx);
         }
+
+        const voicePath = `/static/audio/voice/game_voice/${this.gameState.currentScenario}_${currentId}.wav`;
+        this.audioManager.playVoice(voicePath);
 
         if (dialogue.scene && this.gameData.scenes[dialogue.scene]) {
             this.setBackground(this.gameData.scenes[dialogue.scene].background);
