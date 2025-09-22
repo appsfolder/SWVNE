@@ -23,6 +23,18 @@
         "shy": "/static/character_images/feixiao/shy.png",
         "curious": "/static/character_images/feixiao/curious.png"
       }
+    },
+    "ali_makim": {
+      "name": "Али Маким",
+      "color": "#a0deee",
+      "poses": {
+        "happy": "/static/character_images/ali_makim/happy.png",
+        "sad": "/static/character_images/ali_makim/sad.png",
+        "angry": "/static/character_images/ali_makim/angry.png",
+        "shy": "/static/character_images/ali_makim/shy.png",
+        "curious": "/static/character_images/ali_makim/curious.png",
+        "neutral": "/static/character_images/ali_makim/neutral.png"
+      }
     }
   }
 }

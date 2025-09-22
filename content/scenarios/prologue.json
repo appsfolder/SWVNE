@@ -6,27 +6,40 @@
       "author": "Goon Test Team",
       "start_dialogue": "start",
       "dialogues": {
-        "start":{
+        "start": {
           "scene": "baku",
           "characters_on_screen": [],
           "text": "Однажды в Баку...",
           "next": "start1",
-          "bgm": "/static/audio/bgm/calm_background.mp3"
+          "bgm": "/static/audio/bgm/Whispering-Winds.mp3"
         },
         "start1": {
           "scene": "baku",
           "characters_on_screen": [
-            { "id": "adam", "position": "left", "pose": "curious" }
+            {
+              "id": "adam",
+              "position": "left",
+              "pose": "curious"
+            }
           ],
           "character": "adam",
           "text": "Хм-м... Купить двухсотик про на межятеке или не купить.",
-          "next": "feixiao_enters"
+          "next": "feixiao_enters",
+          "sfx": "/static/audio/sfx/hmm.mp3"
         },
         "feixiao_enters": {
           "scene": "baku",
           "characters_on_screen": [
-            { "id": "adam", "position": "left", "pose": "neutral" },
-            { "id": "feixiao", "position": "right", "pose": "happy" }
+            {
+              "id": "adam",
+              "position": "left",
+              "pose": "neutral"
+            },
+            {
+              "id": "feixiao",
+              "position": "right",
+              "pose": "happy"
+            }
           ],
           "character": "feixiao",
           "text": "Адам! Нашла тебя! Ты заебал про виво болтать, полетели нахуй из баку.",
@@ -35,28 +48,54 @@
         "adam_responds": {
           "scene": "baku",
           "characters_on_screen": [
-            { "id": "adam", "position": "left", "pose": "happy" },
-            { "id": "feixiao", "position": "right", "pose": "neutral" }
+            {
+              "id": "adam",
+              "position": "left",
+              "pose": "happy"
+            },
+            {
+              "id": "feixiao",
+              "position": "right",
+              "pose": "neutral"
+            }
           ],
           "character": "adam",
           "text": "Ээ не я кулер купил мне теперь двухсотик прошка не нужен!",
-          "next": "feixiao_worried"
+          "next": "feixiao_worried",
+          "sfx": "/static/audio/sfx/rizz.mp3"
         },
         "feixiao_worried": {
           "scene": "baku",
           "characters_on_screen": [
-            { "id": "adam", "position": "left", "pose": "neutral" },
-            { "id": "feixiao", "position": "right", "pose": "sad" }
+            {
+              "id": "adam",
+              "position": "left",
+              "pose": "neutral"
+            },
+            {
+              "id": "feixiao",
+              "position": "right",
+              "pose": "sad"
+            }
           ],
           "character": "feixiao",
           "text": "Адам, Посмотри на себя, что ты делаешь? Задумайся...",
-          "next": "adam_choice"
+          "next": "adam_choice",
+          "sfx": "/static/audio/sfx/punch.mp3"
         },
         "adam_choice": {
           "scene": "baku",
           "characters_on_screen": [
-            { "id": "adam", "position": "left", "pose": "shy" },
-            { "id": "feixiao", "position": "right", "pose": "curious" }
+            {
+              "id": "adam",
+              "position": "left",
+              "pose": "shy"
+            },
+            {
+              "id": "feixiao",
+              "position": "right",
+              "pose": "curious"
+            }
           ],
           "character": "adam",
           "text": "Прости... я просто хочу разогнать двухсотик. Но, возможно, ты права.",
@@ -64,41 +103,66 @@
             {
               "text": "Согласиться с Фэйсяо и пойти на самолет в москву.",
               "next": "go_to_airport",
-              "set": { "tech_focus": false, "trust_feixiao": "+1" }
+              "set": {
+                "tech_focus": false,
+                "trust_feixiao": "+1"
+              }
             },
             {
               "text": "Подожди немного, мне нужно запустить ззз в 240 кадров.",
               "next": "stay_play",
-              "set": { "tech_focus": true, "trust_feixiao": "-1" }
+              "set": {
+                "tech_focus": true,
+                "trust_feixiao": "-1"
+              }
             }
           ]
         },
         "go_to_airport": {
           "scene": "aeroport_baku",
           "characters_on_screen": [
-            { "id": "adam", "position": "left", "pose": "happy" },
-            { "id": "feixiao", "position": "right", "pose": "happy" }
+            {
+              "id": "adam",
+              "position": "left",
+              "pose": "happy"
+            },
+            {
+              "id": "feixiao",
+              "position": "right",
+              "pose": "happy"
+            }
           ],
           "character": "feixiao",
           "text": "Давай наконец съебем из этого Баку!",
-          "next": "end_demo"
+          "next": "end_demo",
+          "sfx": "/static/audio/sfx/victory.mp3"
         },
         "stay_play": {
           "scene": "baku",
           "characters_on_screen": [
-            { "id": "adam", "position": "left", "pose": "neutral" },
-            { "id": "feixiao", "position": "right", "pose": "sad" }
+            {
+              "id": "adam",
+              "position": "left",
+              "pose": "neutral"
+            },
+            {
+              "id": "feixiao",
+              "position": "right",
+              "pose": "sad"
+            }
           ],
           "character": "feixiao",
           "text": "Хорошо... Я подожду тебя в аэропорту. Только не гунь на виво слишком долго, пожалуйста.",
-          "next": "end_demo"
+          "next": "end_demo",
+          "sfx": "/static/audio/sfx/roblox-oof.mp3"
         },
         "end_demo": {
           "scene": "baku",
           "characters_on_screen": [],
           "character": null,
           "text": "Это финал короткой демо-истории... Кто знает, что нас ждет в будущем?",
-          "bgm": "stop"
+          "bgm": "stop",
+          "sfx": "/static/audio/sfx/metal-pipe.mp3"
         }
       }
     }
