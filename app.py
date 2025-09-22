@@ -25,6 +25,20 @@ def allowed_file(filename):
 def check_admin():
     return session.get('admin_logged_in', False)
 
+def scan_audio_files(subfolder):
+    """Сканирует папку static/audio и возвращает список путей."""
+    audio_dir = os.path.join(os.path.dirname(__file__), 'static', 'audio', subfolder)
+    if not os.path.exists(audio_dir):
+        return []
+    
+    extensions = ('*.mp3', '*.ogg', '*.wav', '*.m4a')
+    files = []
+    for ext in extensions:
+        files.extend(glob.glob(os.path.join(audio_dir, ext)))
+        
+    paths = [f"/static/audio/{subfolder}/{os.path.basename(f)}" for f in files]
+    return sorted(paths)
+
 class VisualNovelManager:
     def __init__(self, content_path):
         self.content_path = content_path
@@ -194,19 +208,25 @@ def load_game():
 @app.route('/scenario-creator')
 def scenario_creator():
     """Отдает страницу визуального редактора сценариев."""
-
     manager = VisualNovelManager(content_dir)
 
     characters_data = manager.characters
     scenes_data = manager.scenes
+    
+    bgm_files = scan_audio_files('bgm')
+    sfx_files = scan_audio_files('sfx')
 
     characters_json = json.dumps(characters_data)
     scenes_json = json.dumps(scenes_data)
+    bgm_json = json.dumps(bgm_files)
+    sfx_json = json.dumps(sfx_files)
     
     return render_template(
         'scenario_creator.html', 
         characters_json=characters_json, 
-        scenes_json=scenes_json
+        scenes_json=scenes_json,
+        bgm_json=bgm_json,
+        sfx_json=sfx_json
     )
 
 

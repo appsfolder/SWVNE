@@ -83,7 +83,7 @@
                 <textarea class="dialogue-text-input" rows="3"></textarea>
                 <div class="form-group" style="margin-top: 15px;">
                     <label>Условие показа реплики (например, trust > 5)</label>
-                    <input type="text" class="dialogue-condition-input" placeholder="tech_focus == true">
+                    <input type="text" class="dialogue-condition-input" placeholder="sample_variable == true">
                 </div>
                 <div class="form-group">
                     <label>ID реплики, если условие НЕ выполнено</label>
@@ -131,15 +131,25 @@
             </div>
 
             <h4>Аудио</h4>
-            <br>
             <div class="grid">
                 <div class="form-group">
                     <label>Фоновая музыка (BGM)</label>
-                    <input type="text" class="bgm-input" placeholder="/static/audio/bgm/theme.mp3 или 'stop'">
+                    <div class="audio-control-wrapper">
+                        <select class="bgm-select">
+                            <option value="">-- Не менять --</option>
+                            <option value="stop">-- Остановить музыку --</option>
+                        </select>
+                        <button type="button" class="btn audio-preview-btn" data-type="bgm">▶</button>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label>Звуковой эффект (SFX)</label>
-                    <input type="text" class="sfx-input" placeholder="/static/audio/sfx/effect.ogg">
+                    <div class="audio-control-wrapper">
+                        <select class="sfx-select">
+                            <option value="">-- Нет --</option>
+                        </select>
+                        <button type="button" class="btn audio-preview-btn" data-type="bgm">▶</button>
+                    </div>
                 </div>
             </div>
 
@@ -168,6 +178,12 @@
     </script>
     <script id="scenes-data" type="application/json">
         {{ scenes_json|safe }}
+    </script>
+    <script id="bgm-data" type="application/json">
+        {{ bgm_json|safe }}
+    </script>
+    <script id="sfx-data" type="application/json">
+        {{ sfx_json|safe }}
     </script>
     <script src="{{ url_for('static', filename='js/scenario_creator.js') }}"></script>
 </body>
