@@ -6,6 +6,7 @@ class AudioManager {
         this.volume = 0.5;
         this.fadeInterval = null;
         this.isUnlocked = false;
+        this.actionLock = false;
     }
 
     playBGM(src) {
@@ -144,19 +145,37 @@ class VisualNovelEngine {
     }
 
     setupEventListeners() {
+        const performNextAction = () => {
+            if (this.actionLock) return;
+
+            if (this.isTyping) {
+                this.completeTyping();
+            } else if (this.nextActionCallback) {
+                this.actionLock = true;
+
+                const action = this.nextActionCallback;
+                this.nextActionCallback = null;
+                action();
+
+                setTimeout(() => {
+                    this.actionLock = false;
+                }, 200);
+            }
+        };
+
         const dialogueBox = document.getElementById('dialogueBox');
         if (dialogueBox) {
-            dialogueBox.addEventListener('click', () => {
-                if (this.isTyping) {
-                    this.completeTyping();
-                } else if (this.nextActionCallback) {
-                    const action = this.nextActionCallback;
-                    this.nextActionCallback = null;
-                    action();
-                }
-            });
+            dialogueBox.addEventListener('click', performNextAction);
         }
-        document.addEventListener('keydown', (e) => { if (e.code === 'Space' || e.code === 'Enter') { if (this.nextActionCallback) { e.preventDefault(); const action = this.nextActionCallback; this.nextActionCallback = null; action(); } } else if (e.code === 'Escape') { this.showMainMenu(); } });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' || e.code === 'Enter') {
+                e.preventDefault();
+                performNextAction();
+            } else if (e.code === 'Escape') {
+                this.showMainMenu();
+            }
+        });
     }
 
     async loadContentFromServer() {
