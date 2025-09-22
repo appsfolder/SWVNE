@@ -94,8 +94,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         sceneSelect.value = data.scene || '';
         
-        const charSlots = card.querySelectorAll('.character-slot');
-        populateCharacterSlots(charSlots, data.characters_on_screen || []);
+        const slotsContainer = card.querySelector('.characters-slots-container');
+        populateCharacterSlots(slotsContainer, data.characters_on_screen || []);
 
         populateSpeakerDropdown(card.querySelector('.speaker-select'), data.characters_on_screen || [], data.character);
         
@@ -107,7 +107,11 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        card.querySelector('.dialogue-condition-input').value = data.condition || '';
+        // Handle condition input if it exists (from variables system)
+        const conditionInput = card.querySelector('.dialogue-condition-input');
+        if (conditionInput) {
+            conditionInput.value = data.condition || '';
+        }
 
         const bgmSelect = card.querySelector('.bgm-select');
         bgmData.forEach(path => {
@@ -130,41 +134,119 @@ document.addEventListener('DOMContentLoaded', () => {
         return card;
     }
 
-
     function createChoiceRow(text = '', next = '', condition = '', setObj = null) {
         const row = choiceTemplate.content.cloneNode(true).firstElementChild;
         row.querySelector('.choice-text-input').value = text;
-        row.querySelector('.choice-condition-input').value = condition || '';
         
-        let setString = '';
-        if (setObj) {
-            setString = Object.entries(setObj).map(([key, value]) => `${key}=${value}`).join(', ');
+        // Handle condition input if it exists
+        const conditionInput = row.querySelector('.choice-condition-input');
+        if (conditionInput) {
+            conditionInput.value = condition || '';
         }
-        row.querySelector('.choice-set-input').value = setString;
+        
+        // Handle set input if it exists
+        const setInput = row.querySelector('.choice-set-input');
+        if (setInput) {
+            let setString = '';
+            if (setObj) {
+                setString = Object.entries(setObj).map(([key, value]) => `${key}=${value}`).join(', ');
+            }
+            setInput.value = setString;
+        }
 
         return row;
     }
 
-    function populateCharacterSlots(slots, charactersOnScreen) {
-        slots.forEach((slot, index) => {
-            const charSelect = slot.querySelector('.character-select');
-            const poseSelect = slot.querySelector('.pose-select');
-            const posSelect = slot.querySelector('.position-select');
-            
-            charSelect.innerHTML = '<option value="">-- Нет --</option>';
-            for (const charId in charactersData) {
+    function populateCharacterSlots(slotsContainer, charactersOnScreen) {
+        // Clear existing slots
+        slotsContainer.innerHTML = '';
+        
+        // Add slots for existing characters
+        charactersOnScreen.forEach((charData, index) => {
+            addCharacterSlot(slotsContainer, charData, index + 1);
+        });
+        
+        // Always have at least one empty slot
+        if (charactersOnScreen.length === 0) {
+            addCharacterSlot(slotsContainer, null, 1);
+        }
+        
+        // Update all dropdowns after all slots are created
+        updateAllCharacterDropdowns(slotsContainer);
+        
+        // Update position button states
+        updatePositionButtons(slotsContainer);
+    }
+    
+    function addCharacterSlot(container, charData = null, slotNumber = null) {
+        const slotTemplate = document.getElementById('character-slot-template');
+        const slot = slotTemplate.content.cloneNode(true).firstElementChild;
+        
+        if (slotNumber === null) {
+            slotNumber = container.children.length + 1;
+        }
+        
+        slot.querySelector('.slot-number').textContent = slotNumber;
+        
+        const charSelect = slot.querySelector('.character-select');
+        const poseSelect = slot.querySelector('.pose-select');
+        
+        // Populate character dropdown excluding already selected characters
+        populateCharacterDropdown(charSelect, container, charData ? charData.id : null);
+        
+        // Set values if character data provided
+        if (charData) {
+            charSelect.value = charData.id;
+            populatePoseDropdown(poseSelect, charData.id, charData.pose);
+        }
+        
+        container.appendChild(slot);
+        updateSlotNumbers(container);
+        
+        // Add event listener for character selection changes
+        charSelect.addEventListener('change', () => {
+            updateAllCharacterDropdowns(container);
+        });
+        
+        // Set up up/down button event listeners
+        setupPositionButtons(slot, container);
+    }
+    
+    function populateCharacterDropdown(charSelect, container, currentCharId = null) {
+        // Get already selected character IDs (excluding the current one)
+        const selectedCharIds = new Set();
+        container.querySelectorAll('.character-select').forEach(select => {
+            if (select !== charSelect && select.value) {
+                selectedCharIds.add(select.value);
+            }
+        });
+        
+        // Clear and repopulate dropdown
+        charSelect.innerHTML = '<option value="">-- Нет --</option>';
+        
+        for (const charId in charactersData) {
+            // Only add if not already selected by another slot
+            if (!selectedCharIds.has(charId) || charId === currentCharId) {
                 const option = new Option(charactersData[charId].name, charId);
                 charSelect.appendChild(option);
             }
-
-            const charData = charactersOnScreen[index];
-            if (charData) {
-                charSelect.value = charData.id;
-                posSelect.value = charData.position;
-                populatePoseDropdown(poseSelect, charData.id, charData.pose);
-            } else {
-                 poseSelect.innerHTML = '';
-            }
+        }
+    }
+    
+    function updateAllCharacterDropdowns(container) {
+        // Update all dropdowns in the container to reflect current selections
+        container.querySelectorAll('.character-slot').forEach(slot => {
+            const charSelect = slot.querySelector('.character-select');
+            const currentValue = charSelect.value;
+            populateCharacterDropdown(charSelect, container, currentValue);
+            charSelect.value = currentValue; // Restore selection
+        });
+    }
+    
+    function updateSlotNumbers(container) {
+        const slots = container.querySelectorAll('.character-slot');
+        slots.forEach((slot, index) => {
+            slot.querySelector('.slot-number').textContent = index + 1;
         });
     }
 
@@ -195,7 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         allSelects.forEach(select => {
             const currentValue = select.value;
-            select.innerHTML = ''
+            select.innerHTML = '';
 
             if (select.classList.contains('next-if-false-select')) {
                 select.add(new Option("-- Перейти к 'ID Следующей реплики' --", ""));
@@ -219,7 +301,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const cardData = scenarioState.dialogues[cardId];
             if (cardData) {
                 card.querySelector('.next-dialogue-select').value = cardData.next || '';
-                card.querySelector('.next-if-false-select').value = cardData.next_if_false || '';
+                
+                // Handle next-if-false select if it exists
+                const nextIfFalseSelect = card.querySelector('.next-if-false-select');
+                if (nextIfFalseSelect) {
+                    nextIfFalseSelect.value = cardData.next_if_false || '';
+                }
                 card.querySelectorAll('.choice-row').forEach((row, index) => {
                 if(cardData.choices && cardData.choices[index]) {
                     row.querySelector('.choice-next-select').value = cardData.choices[index].next || '';
@@ -228,27 +315,77 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-
-    function handlePositionChange(changedSelect, card) {
-        const allSlots = Array.from(card.querySelectorAll('.character-slot'));
-        const [slot1, slot2] = allSlots;
-        const pos1 = slot1.querySelector('.position-select');
-        const pos2 = slot2.querySelector('.position-select');
-        const char1 = slot1.querySelector('.character-select').value;
-        const char2 = slot2.querySelector('.character-select').value;
-
-        if (char1 && char2) {
-            if (pos1.value === pos2.value) {
-                if (changedSelect === pos1) {
-                    pos2.value = (pos1.value === "left") ? "right" : "left";
-                } else {
-                    pos1.value = (pos2.value === "left") ? "right" : "left";
-                }
-            }
+    
+    function setupPositionButtons(slot, container) {
+        const moveUpBtn = slot.querySelector('.move-up-btn');
+        const moveDownBtn = slot.querySelector('.move-down-btn');
+        
+        moveUpBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            moveSlotUp(slot, container);
+        });
+        
+        moveDownBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            moveSlotDown(slot, container);
+        });
+    }
+    
+    function moveSlotUp(slot, container) {
+        const previousSlot = slot.previousElementSibling;
+        if (previousSlot) {
+            container.insertBefore(slot, previousSlot);
+            updateSlotNumbers(container);
+            updateCharactersOnScreenFromSlots(container);
+            updatePositionButtons(container);
         }
     }
-
-
+    
+    function moveSlotDown(slot, container) {
+        const nextSlot = slot.nextElementSibling;
+        if (nextSlot) {
+            container.insertBefore(nextSlot, slot);
+            updateSlotNumbers(container);
+            updateCharactersOnScreenFromSlots(container);
+            updatePositionButtons(container);
+        }
+    }
+    
+    function updatePositionButtons(container) {
+        const slots = container.querySelectorAll('.character-slot');
+        slots.forEach((slot, index) => {
+            const moveUpBtn = slot.querySelector('.move-up-btn');
+            const moveDownBtn = slot.querySelector('.move-down-btn');
+            
+            // Disable up button for first slot
+            moveUpBtn.disabled = (index === 0);
+            // Disable down button for last slot
+            moveDownBtn.disabled = (index === slots.length - 1);
+        });
+    }
+    
+    function updateCharactersOnScreenFromSlots(container) {
+        const card = container.closest('.dialogue-card');
+        const dialogueId = card.dataset.id;
+        const dialogue = scenarioState.dialogues[dialogueId];
+        
+        const charactersOnScreen = [];
+        container.querySelectorAll('.character-slot').forEach(slot => {
+            const charId = slot.querySelector('.character-select').value;
+            if (charId) {
+                charactersOnScreen.push({
+                    id: charId,
+                    pose: slot.querySelector('.pose-select').value || 'neutral'
+                });
+            }
+        });
+        
+        dialogue.characters_on_screen = charactersOnScreen;
+        
+        // Update speaker dropdown to reflect new order
+        populateSpeakerDropdown(card.querySelector('.speaker-select'), charactersOnScreen, dialogue.character);
+    }
+    
     function handleStateUpdate(e) {
         const target = e.target;
         
@@ -309,40 +446,29 @@ document.addEventListener('DOMContentLoaded', () => {
         if (target.classList.contains('dialogue-condition-input')) dialogue.condition = target.value || undefined;
         if (target.classList.contains('next-if-false-select')) dialogue.next_if_false = target.value || undefined;
         
-        if (target.matches('.character-select, .pose-select, .position-select')) {
+        if (target.matches('.character-select, .pose-select')) {
             const charactersOnScreen = [];
             card.querySelectorAll('.character-slot').forEach(slot => {
                 const charId = slot.querySelector('.character-select').value;
                 if (charId) {
                     charactersOnScreen.push({
                         id: charId,
-                        pose: slot.querySelector('.pose-select').value,
-                        position: slot.querySelector('.position-select').value
+                        pose: slot.querySelector('.pose-select').value || 'neutral'
                     });
                 }
             });
             dialogue.characters_on_screen = charactersOnScreen;
-            
-            if (target.classList.contains('position-select')) {
-                handlePositionChange(target, card);
-                const validatedCharactersOnScreen = [];
-                card.querySelectorAll('.character-slot').forEach(slot => {
-                    const charId = slot.querySelector('.character-select').value;
-                    if (charId) {
-                        validatedCharactersOnScreen.push({
-                            id: charId,
-                            pose: slot.querySelector('.pose-select').value,
-                            position: slot.querySelector('.position-select').value
-                        });
-                    }
-                });
-                dialogue.characters_on_screen = validatedCharactersOnScreen;
-            }
 
             if(target.classList.contains('character-select')) {
-                const poseSelect = target.closest('.character-slot').querySelector('.pose-select');
+                const slot = target.closest('.character-slot');
+                const slotsContainer = slot.parentElement;
+                const poseSelect = slot.querySelector('.pose-select');
+                
                 populatePoseDropdown(poseSelect, target.value);
                 populateSpeakerDropdown(card.querySelector('.speaker-select'), charactersOnScreen, dialogue.character);
+                
+                // Update all character dropdowns to reflect the new selection
+                updateAllCharacterDropdowns(slotsContainer);
             }
         }
         
@@ -442,6 +568,48 @@ document.addEventListener('DOMContentLoaded', () => {
             choicesContainer.appendChild(choiceRow);
             updateAllNextDialogueDropdowns();
             handleStateUpdate({ target: choicesContainer });
+            return;
+        }
+        
+        if (target.classList.contains('add-character-btn')) {
+            const card = target.closest('.dialogue-card');
+            const slotsContainer = card.querySelector('.characters-slots-container');
+            addCharacterSlot(slotsContainer);
+            updatePositionButtons(slotsContainer);
+            return;
+        }
+        
+        if (target.classList.contains('remove-character-btn')) {
+            const slot = target.closest('.character-slot');
+            const slotsContainer = slot.parentElement;
+            const card = target.closest('.dialogue-card');
+            
+            slot.remove();
+            updateSlotNumbers(slotsContainer);
+            
+            // Update all character dropdowns after removal
+            updateAllCharacterDropdowns(slotsContainer);
+            
+            // Update state
+            const charactersOnScreen = [];
+            card.querySelectorAll('.character-slot').forEach(slot => {
+                const charId = slot.querySelector('.character-select').value;
+                if (charId) {
+                    charactersOnScreen.push({
+                        id: charId,
+                        pose: slot.querySelector('.pose-select').value || 'neutral'
+                    });
+                }
+            });
+            const dialogueId = card.dataset.id;
+            scenarioState.dialogues[dialogueId].characters_on_screen = charactersOnScreen;
+            
+            // Update speaker dropdown
+            populateSpeakerDropdown(card.querySelector('.speaker-select'), charactersOnScreen, scenarioState.dialogues[dialogueId].character);
+            
+            // Update position buttons
+            updatePositionButtons(slotsContainer);
+            return;
         }
     }
 
