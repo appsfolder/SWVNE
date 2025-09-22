@@ -960,11 +960,64 @@ body.creator-body, body.admin-body {
 }
 
 .audio-preview-btn:disabled {
-    background-color: #ced4da; /* Светло-серый цвет */
-    color: #6c757d; /* Темно-серый текст */
-    cursor: not-allowed; /* Курсор "запрещено" */
+    background-color: #ced4da;
+    color: #6c757d;
+    cursor: not-allowed;
     box-shadow: none;
     transform: none;
+}
+
+.char-color-input {
+    width: 100%;
+    height: 42px;
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+}
+
+.pose-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+}
+
+.pose-slot {
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    transition: border-color 0.3s;
+}
+
+.pose-slot.filled {
+    border-color: var(--color-teal);
+    border-style: solid;
+}
+
+.pose-slot img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 4px;
+    background-color: #f0f0f0;
+    margin-bottom: 10px;
+    display: none
+}
+
+.pose-slot.filled img {
+    display: block;
+}
+
+.pose-slot .pose-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--color-dark-purple);
+}
+
+.pose-slot .file-input-label {
+    padding: 8px 12px;
 }
 
 @media (max-width: 768px) {

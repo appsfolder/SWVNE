@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактор персонажей - VNE</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="creator-body">
+    <div class="creator-container">
+        <header class="creator-header">
+            <h1>Создание персонажа</h1>
+            <a href="/" class="btn btn--secondary">Главное меню</a>
+        </header>
+
+        <div class="creator-card">
+            <h3>Основные данные</h3>
+            <br>
+            <div class="grid" style="grid-template-columns: 2fr 2fr 1fr;">
+                <div class="form-group">
+                    <label for="char-id">ID Персонажа (латиница, без пробелов)</label>
+                    <input type="text" id="char-id" placeholder="character_id" required>
+                </div>
+                <div class="form-group">
+                    <label for="char-name">Имя персонажа (как в игре)</label>
+                    <input type="text" id="char-name" placeholder="Имя персонажа" required>
+                </div>
+                <div class="form-group">
+                    <label for="char-color">Цвет</label>
+                    <input type="color" id="char-color" value="#000000" class="char-color-input">
+                </div>
+            </div>
+        </div>
+
+        <div class="creator-card">
+            <h3>Изображения (все 6 обязательны)</h3>
+            <br>
+            <div class="pose-grid">
+            </div>
+        </div>
+
+        <div class="creator-card">
+            <div class="controls-wrapper" style="justify-content: center;">
+                 <button class="btn btn--primary" id="generate-json-btn">Сгенерировать и скачать JSON</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/character_creator.js') }}"></script>
+</body>
+</html>

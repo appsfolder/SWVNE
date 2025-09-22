@@ -229,6 +229,11 @@ def scenario_creator():
         sfx_json=sfx_json
     )
 
+@app.route('/character-creator')
+def character_creator():
+    """Отдает страницу визуального редактора персонажей."""
+    return render_template('character_creator.html')
+
 
 if __name__ == '__main__':
     if not os.path.exists(content_dir):
