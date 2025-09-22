@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateCharacterState();
         
         if (!characterState.id) {
-            alert('Пожалуйста, сначала укажите ID персонажа');
+            notifications.error('Ошибка загрузки', 'Пожалуйста, сначала укажите ID персонажа');
             e.target.value = '';
             return;
         }
@@ -156,14 +156,15 @@ document.addEventListener('DOMContentLoaded', () => {
         updateCharacterState();
 
         if (!characterState.id || !characterState.name) {
-            alert('Пожалуйста, укажите ID и имя персонажа');
+            notifications.error('Необходимые данные', 'Пожалуйста, укажите ID и имя персонажа');
             return;
         }
 
         const missingPoses = poseKeys.filter(key => !characterState.poses[key]);
         if (missingPoses.length > 0) {
             const missingLabels = missingPoses.map(key => poseLabels[key]).join(', ');
-            if (!confirm(`Не хватает изображений для: ${missingLabels}.\n\nСохранить всё равно?`)) {
+            const shouldContinue = await notifications.confirm('Неполные данные', `Не хватает изображений для: ${missingLabels}.\n\nСохранить всё равно?`);
+            if (!shouldContinue) {
                 return;
             }
         }
@@ -192,14 +193,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await response.json();
 
             if (result.success) {
-                alert(result.message);
+                notifications.success('Успешно', result.message);
                 await loadCharactersList();
             } else {
-                alert('Ошибка сохранения: ' + result.error);
+                notifications.error('Ошибка сохранения', result.error);
             }
         } catch (error) {
             console.error('Save error:', error);
-            alert('Ошибка сохранения персонажа');
+            notifications.error('Ошибка сохранения', 'Не удалось сохранить персонажа. Попробуйте снова.');
         } finally {
             hideProgress();
         }
@@ -275,21 +276,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 });
                 
-                alert('Персонаж загружен успешно!');
+                notifications.success('Загрузка завершена', 'Персонаж загружен успешно!');
             } else {
-                alert('Персонаж не найден');
+                notifications.error('Ошибка загрузки', 'Персонаж не найден');
             }
         } catch (error) {
             console.error('Load error:', error);
-            alert('Ошибка загрузки персонажа');
+            notifications.error('Ошибка загрузки', 'Не удалось загрузить персонажа. Попробуйте снова.');
         } finally {
             hideProgress();
         }
     }
 
     // Create new character
-    function createNewCharacter() {
-        if (confirm('Создать нового персонажа? Несохранённые изменения будут потеряны.')) {
+    async function createNewCharacter() {
+        const shouldCreate = await notifications.confirm('Новый персонаж', 'Создать нового персонажа?\n\nНесохранённые изменения будут потеряны.');
+        if (shouldCreate) {
             // Reset form
             idInput.value = '';
             nameInput.value = '';
@@ -347,7 +349,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (selectedCharacter) {
             loadCharacter(selectedCharacter);
         } else {
-            alert('Пожалуйста, выберите персонажа для загрузки.');
+            notifications.warning('Выбор персонажа', 'Пожалуйста, выберите персонажа для загрузки.');
         }
     });
     
