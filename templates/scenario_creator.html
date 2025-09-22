@@ -17,11 +17,14 @@
 
         <div class="creator-card controls-card">
             <div class="creator-card-content">
-                <h3>Действия с файлом</h3>
+                <h3>Управление сценарием</h3>
                 <div class="controls-wrapper">
-                    <button class="btn btn--primary" id="save-json-btn">Сохранить</button>
-                    <label for="load-json-input" class="btn btn--secondary">Загрузить</label>
-                    <input type="file" id="load-json-input" accept=".json" style="display: none;">
+                    <button class="btn btn--primary" id="save-scenario-btn">Сохранить сценарий</button>
+                    <select id="load-scenario-select" class="form-control" style="min-width: 200px;">
+                        <option value="">-- Загрузить сценарий --</option>
+                    </select>
+                    <button class="btn btn--secondary" id="load-scenario-btn">Загрузить</button>
+                    <button class="btn btn--secondary" id="new-scenario-btn">Новый сценарий</button>
                 </div>
             </div>
         </div>

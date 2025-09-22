@@ -229,6 +229,70 @@ def scenario_creator():
         sfx_json=sfx_json
     )
 
+@app.route('/api/scenarios/save', methods=['POST'])
+def save_scenario():
+    """Save scenario data to file."""
+    try:
+        scenario_data = request.json
+        
+        if not scenario_data or 'scenarios' not in scenario_data:
+            return jsonify({'success': False, 'error': 'Неверный формат данных'}), 400
+            
+        scenario_id = list(scenario_data['scenarios'].keys())[0]
+        if not scenario_id:
+            return jsonify({'success': False, 'error': 'ID сценария не найден'}), 400
+        scenarios_dir = os.path.join(content_dir, 'scenarios')
+        if not os.path.exists(scenarios_dir):
+            os.makedirs(scenarios_dir)
+        file_path = os.path.join(scenarios_dir, f'{scenario_id}.json')
+        with open(file_path, 'w', encoding='utf-8') as f:
+            json.dump(scenario_data, f, ensure_ascii=False, indent=2)
+        
+        return jsonify({'success': True, 'message': f'Сценарий "{scenario_id}" сохранен успешно'})
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/scenarios/list')
+def list_scenarios():
+    """Get list of available scenarios."""
+    try:
+        manager = VisualNovelManager(content_dir)
+        scenarios_list = []
+        
+        for scenario_id, scenario_data in manager.scenarios.items():
+            scenarios_list.append({
+                'id': scenario_id,
+                'title': scenario_data.get('title', scenario_id),
+                'description': scenario_data.get('description', ''),
+                'author': scenario_data.get('author', ''),
+            })
+        
+        return jsonify({'scenarios': scenarios_list})
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/scenarios/load/<scenario_id>')
+def load_scenario(scenario_id):
+    """Load specific scenario data."""
+    try:
+        manager = VisualNovelManager(content_dir)
+        
+        if scenario_id not in manager.scenarios:
+            return jsonify({'error': 'Сценарий не найден'}), 404
+            
+        scenario_data = {
+            'scenarios': {
+                scenario_id: manager.scenarios[scenario_id]
+            }
+        }
+        
+        return jsonify(scenario_data)
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/character-creator')
 def character_creator():
     """Отдает страницу визуального редактора персонажей."""

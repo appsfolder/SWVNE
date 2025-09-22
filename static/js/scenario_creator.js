@@ -18,8 +18,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const sfxData = JSON.parse(document.getElementById('sfx-data').textContent);
 
     const addDialogueBtn = document.getElementById('add-dialogue-btn');
-    const saveJsonBtn = document.getElementById('save-json-btn');
-    const loadJsonInput = document.getElementById('load-json-input');
+    const saveScenarioBtn = document.getElementById('save-scenario-btn');
+    const loadScenarioSelect = document.getElementById('load-scenario-select');
+    const loadScenarioBtn = document.getElementById('load-scenario-btn');
+    const newScenarioBtn = document.getElementById('new-scenario-btn');
     const cardsContainer = document.getElementById('dialogue-cards-container');
     const cardTemplate = document.getElementById('dialogue-card-template');
     const choiceTemplate = document.getElementById('choice-row-template');
@@ -626,9 +628,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    saveJsonBtn.addEventListener('click', () => {
+    async function saveScenario() {
         if (!scenarioState.meta.id) {
-            alert('Пожалуйста, укажите ID сценария в метаданных!');
+            alert('Пожалуйста, укажите ID сценария!');
             return;
         }
         
@@ -644,51 +646,122 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
-        const blob = new Blob([JSON.stringify(finalJson, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${scenarioState.meta.id}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-    });
-
-    loadJsonInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            try {
-                const data = JSON.parse(event.target.result);
-                if (!data.scenarios) throw new Error("Отсутствует ключ 'scenarios'");
-
-                const scenarioId = Object.keys(data.scenarios)[0];
-                if (!scenarioId) throw new Error("Не найден ни один сценарий в файле");
-                
-                const loadedScenario = data.scenarios[scenarioId];
-                
-                scenarioState.meta.id = scenarioId;
-                scenarioState.meta.title = loadedScenario.title;
-                scenarioState.meta.description = loadedScenario.description;
-                scenarioState.meta.author = loadedScenario.author;
-                scenarioState.meta.start_dialogue = loadedScenario.start_dialogue;
-                scenarioState.dialogues = loadedScenario.dialogues || {};
-
-                renderAll();
-
-            } catch (err) {
-                alert(`Ошибка чтения файла: ${err.message}`);
-            } finally {
-                loadJsonInput.value = '';
+        try {
+            const response = await fetch('/api/scenarios/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(finalJson)
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                alert(result.message);
+                await loadScenariosList();
+            } else {
+                alert('Ошибка сохранения: ' + result.error);
             }
-        };
-        reader.readAsText(file);
+        } catch (error) {
+            console.error('Error saving scenario:', error);
+            alert('Ошибка сохранения сценария');
+        }
+    }
+    
+    saveScenarioBtn.addEventListener('click', saveScenario);
+
+    async function loadScenariosList() {
+        try {
+            const response = await fetch('/api/scenarios/list');
+            const result = await response.json();
+            
+            if (result.scenarios) {
+                loadScenarioSelect.innerHTML = '<option value="">-- Загрузить сценарий --</option>';
+                
+                result.scenarios.forEach(scenario => {
+                    const option = new Option(
+                        `${scenario.title || scenario.id} (ID: ${scenario.id})`,
+                        scenario.id
+                    );
+                    loadScenarioSelect.appendChild(option);
+                });
+            }
+        } catch (error) {
+            console.error('Error loading scenarios list:', error);
+        }
+    }
+    
+    async function loadScenario(scenarioId) {
+        try {
+            const response = await fetch(`/api/scenarios/load/${scenarioId}`);
+            const data = await response.json();
+            
+            if (data.error) {
+                alert('Ошибка загрузки: ' + data.error);
+                return;
+            }
+            
+            if (!data.scenarios) {
+                alert('Неверный формат данных');
+                return;
+            }
+            
+            const loadedScenario = data.scenarios[scenarioId];
+            if (!loadedScenario) {
+                alert('Сценарий не найден');
+                return;
+            }
+            
+            scenarioState.meta.id = scenarioId;
+            scenarioState.meta.title = loadedScenario.title || '';
+            scenarioState.meta.description = loadedScenario.description || '';
+            scenarioState.meta.author = loadedScenario.author || '';
+            scenarioState.meta.start_dialogue = loadedScenario.start_dialogue || 'start';
+            scenarioState.dialogues = loadedScenario.dialogues || { 'start': { text: '', scene: '' } };
+            
+            renderAll();
+            alert('Сценарий загружен успешно!');
+            
+        } catch (error) {
+            console.error('Error loading scenario:', error);
+            alert('Ошибка загрузки сценария');
+        }
+    }
+    
+    function createNewScenario() {
+        if (confirm('Создать новый сценарий? Несохранённые изменения будут потеряны.')) {
+            scenarioState = {
+                meta: {
+                    id: '',
+                    title: '',
+                    description: '',
+                    author: '',
+                    start_dialogue: 'start'
+                },
+                dialogues: {
+                    'start': { text: '', scene: '' }
+                }
+            };
+            renderAll();
+        }
+    }
+    
+    loadScenarioBtn.addEventListener('click', () => {
+        const selectedScenario = loadScenarioSelect.value;
+        if (selectedScenario) {
+            loadScenario(selectedScenario);
+        } else {
+            alert('Пожалуйста, выберите сценарий для загрузки.');
+        }
     });
+    
+    newScenarioBtn.addEventListener('click', createNewScenario);
 
     document.querySelector('.creator-container').addEventListener('change', handleStateUpdate);
     document.querySelector('.creator-container').addEventListener('input', handleStateUpdate);
     document.querySelector('.creator-container').addEventListener('click', handleClicks);
 
     renderAll();
+    loadScenariosList();
 });
