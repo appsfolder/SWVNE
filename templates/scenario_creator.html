@@ -81,6 +81,14 @@
             <div class="form-group">
                 <label>Текст реплики</label>
                 <textarea class="dialogue-text-input" rows="3"></textarea>
+                <div class="form-group" style="margin-top: 15px;">
+                    <label>Условие показа реплики (например, trust > 5)</label>
+                    <input type="text" class="dialogue-condition-input" placeholder="tech_focus == true">
+                </div>
+                <div class="form-group">
+                    <label>ID реплики, если условие НЕ выполнено</label>
+                    <select class="next-if-false-select"><option value="">-- Перейти к 'ID Следующей реплики' --</option></select>
+                </div>
             </div>
             
             <div class="characters-section">
@@ -114,7 +122,13 @@
 
     <template id="choice-row-template">
         <div class="choice-row" style="display: flex; gap: 10px; align-items: center; margin-bottom: 5px;">
-            <input type="text" class="choice-text-input" placeholder="Текст выбора" style="flex-grow: 1;">
+            <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 5px;">
+                <input type="text" class="choice-text-input" placeholder="Текст выбора">
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" class="choice-condition-input" placeholder="Условие (например, has_key == true)" style="width: 50%;">
+                    <input type="text" class="choice-set-input" placeholder="Переменные (например, trust=+1, key=false)" style="width: 50%;">
+                </div>
+            </div>
             <select class="choice-next-select" style="width: 200px;"></select>
             <span class="remove-btn" title="Удалить выбор">✖</span>
         </div>

@@ -76,8 +76,6 @@ class VisualNovelManager:
              self.scenarios = self._load_from_directory(os.path.join(self.content_path, 'scenarios'), 'scenarios')
 
 content_dir = os.path.join(os.path.dirname(__file__), 'content')
-novel_manager = VisualNovelManager(content_dir)
-
 
 @app.route('/')
 def index():
@@ -113,15 +111,18 @@ def admin_logout():
 
 @app.route('/api/content/characters')
 def get_characters():
-    return jsonify(novel_manager.characters)
+    manager = VisualNovelManager(content_dir)
+    return jsonify(manager.characters)
 
 @app.route('/api/content/scenes')
 def get_scenes():
-    return jsonify(novel_manager.scenes)
+    manager = VisualNovelManager(content_dir)
+    return jsonify(manager.scenes)
 
 @app.route('/api/content/scenarios')
 def get_scenarios():
-    return jsonify(novel_manager.scenarios)
+    manager = VisualNovelManager(content_dir)
+    return jsonify(manager.scenarios)
 
 def handle_upload(content_type):
     if not check_admin():
@@ -142,7 +143,6 @@ def handle_upload(content_type):
     filepath = os.path.join(upload_path, filename)
     file.save(filepath)
     
-    novel_manager.reload_content(content_type)
     return jsonify({'success': True, 'message': f'{content_type.capitalize()} загружены успешно'})
 
 @app.route('/api/admin/content/upload/characters', methods=['POST'])
@@ -163,13 +163,15 @@ def admin_export_content(content_type):
     if not check_admin():
         return jsonify({'error': 'Доступ запрещен'}), 403
 
+    manager = VisualNovelManager(content_dir)
+
     try:
         if content_type == 'characters':
-            data = {'characters': novel_manager.characters}
+            data = {'characters': manager.characters}
         elif content_type == 'scenes':
-            data = {'scenes': novel_manager.scenes}
+            data = {'scenes': manager.scenes}
         elif content_type == 'scenarios':
-            data = {'scenarios': novel_manager.scenarios}
+            data = {'scenarios': manager.scenarios}
         else:
             return jsonify({'error': 'Неизвестный тип контента'}), 400
 
@@ -193,8 +195,10 @@ def load_game():
 def scenario_creator():
     """Отдает страницу визуального редактора сценариев."""
 
-    characters_data = novel_manager.characters
-    scenes_data = novel_manager.scenes
+    manager = VisualNovelManager(content_dir)
+
+    characters_data = manager.characters
+    scenes_data = manager.scenes
 
     characters_json = json.dumps(characters_data)
     scenes_json = json.dumps(scenes_data)

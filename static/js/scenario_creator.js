@@ -79,12 +79,21 @@ document.addEventListener('DOMContentLoaded', () => {
         card.querySelector('.bgm-input').value = data.bgm || '';
         card.querySelector('.sfx-input').value = data.sfx || '';
 
+        card.querySelector('.dialogue-condition-input').value = data.condition || '';
+
         return card;
     }
 
     function createChoiceRow(text = '', next = '') {
         const row = choiceTemplate.content.cloneNode(true).firstElementChild;
         row.querySelector('.choice-text-input').value = text;
+        row.querySelector('.choice-condition-input').value = condition || '';
+        let setString = '';
+        if (setObj) {
+            setString = Object.entries(setObj).map(([key, value]) => `${key}=${value}`).join(', ');
+        }
+        row.querySelector('.choice-set-input').value = setString;
+
         return row;
     }
 
@@ -204,7 +213,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateAllNextDialogueDropdowns() {
         const dialogueIds = Object.keys(scenarioState.dialogues);
-        const allSelects = document.querySelectorAll('.next-dialogue-select, .choice-next-select');
+        const allSelects = document.querySelectorAll('.next-dialogue-select, .choice-next-select, .next-if-false-select');
+        card.querySelector('.next-if-false-select').value = cardData.next_if_false || '';
         
         allSelects.forEach(select => {
             const currentValue = select.value;
@@ -361,6 +371,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (target.classList.contains('scene-select')) dialogue.scene = target.value || undefined;
         if (target.classList.contains('bgm-input')) dialogue.bgm = target.value || undefined;
         if (target.classList.contains('sfx-input')) dialogue.sfx = target.value || undefined;
+        if (target.classList.contains('dialogue-condition-input')) dialogue.condition = target.value || undefined;
+        if (target.classList.contains('next-if-false-select')) dialogue.next_if_false = target.value || undefined;
         
         if (target.matches('.character-select, .pose-select')) {
             const charactersOnScreen = [];
@@ -388,13 +400,33 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
-        if (target.matches('.choice-text-input, .choice-next-select')) {
+        if (target.matches('.choice-text-input, .choice-next-select, .choice-condition-input, .choice-set-input')) {
             const choices = [];
             card.querySelectorAll('.choice-row').forEach(row => {
                 const text = row.querySelector('.choice-text-input').value;
-                const next = row.querySelector('.choice-next-select').value;
                 if (text) {
-                    choices.push({ text, next: next || null });
+                    const choice = {
+                        text,
+                        next: row.querySelector('.choice-next-select').value || null,
+                        condition: row.querySelector('.choice-condition-input').value || undefined,
+                    };
+
+                    const setString = row.querySelector('.choice-set-input').value;
+                    if (setString) {
+                        const setObj = {};
+                        setString.split(',').forEach(pair => {
+                            const parts = pair.split('=').map(p => p.trim());
+                            if (parts.length === 2) {
+                                let value = parts[1];
+                                if (value.toLowerCase() === 'true') value = true;
+                                else if (value.toLowerCase() === 'false') value = false;
+                                else if (!isNaN(parseFloat(value)) && !value.startsWith('+') && !value.startsWith('-')) value = parseFloat(value);
+                                setObj[parts[0]] = value;
+                            }
+                        });
+                        choice.set = setObj;
+                    }
+                    choices.push(choice);
                 }
             });
             dialogue.choices = choices.length > 0 ? choices : undefined;
