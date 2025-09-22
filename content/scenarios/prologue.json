@@ -63,15 +63,17 @@
           "choices": [
             {
               "text": "Согласиться с Фэйсяо и пойти на самолет в москву.",
-              "next": "go_to_garden"
+              "next": "go_to_airport",
+              "set": { "tech_focus": false, "trust_feixiao": "+1" }
             },
             {
               "text": "Подожди немного, мне нужно запустить ззз в 240 кадров.",
-              "next": "stay_in_lab"
+              "next": "stay_play",
+              "set": { "tech_focus": true, "trust_feixiao": "-1" }
             }
           ]
         },
-        "go_to_garden": {
+        "go_to_airport": {
           "scene": "aeroport_baku",
           "characters_on_screen": [
             { "id": "adam", "position": "left", "pose": "happy" },
@@ -81,7 +83,7 @@
           "text": "Давай наконец съебем из этого Баку!",
           "next": "end_demo"
         },
-        "stay_in_lab": {
+        "stay_play": {
           "scene": "baku",
           "characters_on_screen": [
             { "id": "adam", "position": "left", "pose": "neutral" },

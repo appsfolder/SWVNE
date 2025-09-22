@@ -254,11 +254,78 @@ class VisualNovelEngine {
 
     
 
+    checkCondition(conditionString) {
+        if (!conditionString) return true;
+
+        const operators = /(==|!=|>=|<=|>|<)/;
+        const parts = conditionString.split(operators).map(p => p.trim());
+
+        if (parts.length !== 3) {
+            console.error(`Invalid condition format: "${conditionString}"`);
+            return false;
+        }
+
+        const [varName, operator, valueStr] = parts;
+        
+        let stateValue = this.gameState.variables[varName];
+        if (stateValue === undefined) stateValue = 0;
+
+        let compareValue;
+        if (valueStr.toLowerCase() === 'true') {
+            compareValue = true;
+        } else if (valueStr.toLowerCase() === 'false') {
+            compareValue = false;
+        } else if (!isNaN(parseFloat(valueStr))) {
+            compareValue = parseFloat(valueStr);
+        } else {
+            compareValue = valueStr.replace(/^['"]|['"]$/g, '');
+        }
+
+        switch (operator) {
+            case '==': return stateValue == compareValue;
+            case '!=': return stateValue != compareValue;
+            case '>':  return stateValue > compareValue;
+            case '<':  return stateValue < compareValue;
+            case '>=': return stateValue >= compareValue;
+            case '<=': return stateValue <= compareValue;
+            default:   return false;
+        }
+    }
+
+    setVariable(key, value) {
+        if (typeof value === 'string' && (value.startsWith('+') || value.startsWith('-'))) {
+            const currentVal = this.gameState.variables[key] || 0;
+            const change = parseFloat(value);
+            this.gameState.variables[key] = currentVal + change;
+        } else {
+            this.gameState.variables[key] = value;
+        }
+        console.log("Variables updated:", this.gameState.variables);
+    }
+    
     async displayDialogue(dialogueId) {
-        const scenario = this.gameData.scenarios[this.gameState.currentScenario];
-        if (!scenario) { console.error('Current scenario not found:', this.gameState.currentScenario); return; }
-        const dialogue = scenario.dialogues[dialogueId];
-        if (!dialogue) { console.error('Dialogue not found:', dialogueId, 'in scenario', this.gameState.currentScenario); return; }
+        let currentId = dialogueId;
+        let dialogue = null;
+        let protection = 0;
+
+        while (protection < 100) {
+            const scenario = this.gameData.scenarios[this.gameState.currentScenario];
+            if (!scenario) { console.error('Scenario not found'); return; }
+            dialogue = scenario.dialogues[currentId];
+            if (!dialogue) { console.error(`Dialogue not found: ${currentId}`); return; }
+
+            if (this.checkCondition(dialogue.condition)) {
+                break;
+            } else {
+                currentId = dialogue.next_if_false || dialogue.next;
+                if (!currentId) { 
+                    this.showMainMenu();
+                    return;
+                }
+            }
+            protection++;
+        }
+        if (protection >= 100) { console.error("Infinite loop!"); return; }
 
         if (dialogue.bgm) {
             this.audioManager.playBGM(dialogue.bgm);
@@ -295,7 +362,38 @@ class VisualNovelEngine {
 
     
     setNextAction(callback) { this.nextActionCallback = callback; document.getElementById('clickIndicator').classList.remove('hidden'); if (this.autoMode && callback) { setTimeout(() => { if (this.nextActionCallback) { const action = this.nextActionCallback; this.nextActionCallback = null; action(); } }, this.autoDelay); } }
-    showChoices(choices, speakerId) { document.getElementById('clickIndicator').classList.add('hidden'); this.nextActionCallback = null; const choicesContainer = document.getElementById('choicesContainer'); choicesContainer.innerHTML = ''; let buttonColor = 'var(--color-teal)'; if (speakerId && this.gameData.characters[speakerId]) { buttonColor = this.gameData.characters[speakerId].color; } choices.forEach(choice => { const button = document.createElement('button'); button.className = 'choice-button'; button.textContent = choice.text; button.style.setProperty('--choice-bg', buttonColor); button.onclick = () => this.selectChoice(choice); choicesContainer.appendChild(button); }); choicesContainer.classList.remove('hidden'); }
+    showChoices(choices, speakerId) {
+        document.getElementById('clickIndicator').classList.add('hidden');
+        this.nextActionCallback = null;
+
+        const choicesContainer = document.getElementById('choicesContainer');
+        choicesContainer.innerHTML = '';
+        
+        let buttonColor = 'var(--color-teal)';
+        if (speakerId && this.gameData.characters[speakerId]) {
+            buttonColor = this.gameData.characters[speakerId].color;
+        }
+
+        const availableChoices = choices.filter(choice => this.checkCondition(choice.condition));
+
+        if (availableChoices.length > 0) {
+            availableChoices.forEach(choice => {
+                const button = document.createElement('button');
+                button.className = 'choice-button';
+                button.textContent = choice.text;
+                button.style.setProperty('--choice-bg', buttonColor);
+                button.onclick = () => this.selectChoice(choice);
+                choicesContainer.appendChild(button);
+            });
+            choicesContainer.classList.remove('hidden');
+        } else {
+            if (this.gameData.scenarios[this.gameState.currentScenario].dialogues[this.gameState.currentDialogue].next) {
+                 this.setNextAction(() => this.displayDialogue(this.gameData.scenarios[this.gameState.currentScenario].dialogues[this.gameState.currentDialogue].next));
+            } else {
+                 this.setNextAction(() => this.showMainMenu());
+            }
+        }
+    }
     updateScenarioInfoDisplay(scenarioId) {
         const scenario = this.gameData.scenarios[scenarioId];
         const titleEl = document.getElementById('scenarioTitle');
@@ -345,7 +443,18 @@ class VisualNovelEngine {
     hideCharacterName() { document.getElementById('characterName').classList.add('hidden'); }
     async typeText(text) { const dialogueTextElement = document.getElementById('dialogueText'); this.isTyping = true; this.currentText = ''; dialogueTextElement.innerHTML = ''; for (let i = 0; i < text.length; i++) { if (!this.isTyping) break; this.currentText += text[i]; dialogueTextElement.innerHTML = this.currentText + '<span class="typing-cursor">|</span>'; await new Promise(resolve => setTimeout(resolve, this.settings.textSpeed)); } this.isTyping = false; dialogueTextElement.innerHTML = text; }
     completeTyping() { this.isTyping = false; }
-    selectChoice(choice) { if (choice.variable) { Object.assign(this.gameState.variables, choice.variable); } if (choice.next) { this.displayDialogue(choice.next); } this.hideChoices(); }
+    selectChoice(choice) {
+        if (choice.set) {
+            for (const key in choice.set) {
+                this.setVariable(key, choice.set[key]);
+            }
+        }
+
+        if (choice.next) {
+            this.displayDialogue(choice.next);
+        }
+        this.hideChoices();
+    }
     hideChoices() { const choicesContainer = document.getElementById('choicesContainer'); choicesContainer.classList.add('hidden'); choicesContainer.innerHTML = ''; }
     loadSettings() {
         const saved = localStorage.getItem('vnSettings');
