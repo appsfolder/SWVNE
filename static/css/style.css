@@ -1538,6 +1538,50 @@ select.form-control,
     margin: 0;
 }
 
+.contributors {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    color: var(--color-gray);
+}
+
+.contributors-title {
+    font-size: var(--font-size-small);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.contributor-links {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.contributor {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: var(--color-dark-blue);
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+}
+
+.contributor:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.contributor .github-icon {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
+
 @media (max-width: 768px) {
     .menu-container, .settings-container, .history-container {
         width: 95%;
