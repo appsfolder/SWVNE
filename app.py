@@ -232,6 +232,10 @@ def scenario_creator():
 @app.route('/api/scenarios/save', methods=['POST'])
 def save_scenario():
     """Save scenario data to file."""
+    # SECURITY: Require admin authentication
+    if not check_admin():
+        return jsonify({'success': False, 'error': 'Доступ запрещён'}), 403
+        
     try:
         scenario_data = request.json
         
@@ -241,17 +245,32 @@ def save_scenario():
         scenario_id = list(scenario_data['scenarios'].keys())[0]
         if not scenario_id:
             return jsonify({'success': False, 'error': 'ID сценария не найден'}), 400
+        
+        # SECURITY: Validate scenario_id to prevent path traversal
+        if not scenario_id.replace('_', '').replace('-', '').isalnum() or len(scenario_id) > 50:
+            return jsonify({'success': False, 'error': 'Недопустимые символы в ID сценария'}), 400
+        
+        # SECURITY: Use secure_filename for additional protection
+        safe_scenario_id = secure_filename(scenario_id)
+        if not safe_scenario_id:
+            return jsonify({'success': False, 'error': 'Недопустимый ID сценария'}), 400
+            
         scenarios_dir = os.path.join(content_dir, 'scenarios')
         if not os.path.exists(scenarios_dir):
             os.makedirs(scenarios_dir)
-        file_path = os.path.join(scenarios_dir, f'{scenario_id}.json')
+        file_path = os.path.join(scenarios_dir, f'{safe_scenario_id}.json')
+        
+        # SECURITY: Validate that the path is within the expected directory
+        if not os.path.abspath(file_path).startswith(os.path.abspath(scenarios_dir)):
+            return jsonify({'success': False, 'error': 'Недопустимый путь к файлу'}), 400
+            
         with open(file_path, 'w', encoding='utf-8') as f:
             json.dump(scenario_data, f, ensure_ascii=False, indent=2)
         
-        return jsonify({'success': True, 'message': f'Сценарий "{scenario_id}" сохранен успешно'})
+        return jsonify({'success': True, 'message': f'Сценарий "{safe_scenario_id}" сохранен успешно'})
         
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        return jsonify({'success': False, 'error': 'Ошибка сервера'}), 500
 
 @app.route('/api/scenarios/list')
 def list_scenarios():
@@ -277,6 +296,10 @@ def list_scenarios():
 def load_scenario(scenario_id):
     """Load specific scenario data."""
     try:
+        # SECURITY: Validate scenario_id to prevent path traversal
+        if not scenario_id.replace('_', '').replace('-', '').isalnum() or len(scenario_id) > 50:
+            return jsonify({'error': 'Недопустимые символы в ID сценария'}), 400
+        
         manager = VisualNovelManager(content_dir)
         
         if scenario_id not in manager.scenarios:
@@ -291,7 +314,7 @@ def load_scenario(scenario_id):
         return jsonify(scenario_data)
         
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'error': 'Ошибка сервера'}), 500
 
 @app.route('/character-creator')
 def character_creator():
