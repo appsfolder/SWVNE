@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const choicesContainer = card.querySelector('.choices-container');
         if (data.choices) {
             data.choices.forEach(choice => {
-                const choiceRow = createChoiceRow(choice.text, choice.next);
+                const choiceRow = createChoiceRow(choice.text, choice.next, choice.condition, choice.set);
                 choicesContainer.appendChild(choiceRow);
             });
         }
@@ -79,20 +79,34 @@ document.addEventListener('DOMContentLoaded', () => {
         card.querySelector('.bgm-input').value = data.bgm || '';
         card.querySelector('.sfx-input').value = data.sfx || '';
 
-        card.querySelector('.dialogue-condition-input').value = data.condition || '';
+        // Handle condition input if it exists (from variables system)
+        const conditionInput = card.querySelector('.dialogue-condition-input');
+        if (conditionInput) {
+            conditionInput.value = data.condition || '';
+        }
 
         return card;
     }
 
-    function createChoiceRow(text = '', next = '') {
+    function createChoiceRow(text = '', next = '', condition = '', setObj = null) {
         const row = choiceTemplate.content.cloneNode(true).firstElementChild;
         row.querySelector('.choice-text-input').value = text;
-        row.querySelector('.choice-condition-input').value = condition || '';
-        let setString = '';
-        if (setObj) {
-            setString = Object.entries(setObj).map(([key, value]) => `${key}=${value}`).join(', ');
+        
+        // Handle condition input if it exists
+        const conditionInput = row.querySelector('.choice-condition-input');
+        if (conditionInput) {
+            conditionInput.value = condition || '';
         }
-        row.querySelector('.choice-set-input').value = setString;
+        
+        // Handle set input if it exists
+        const setInput = row.querySelector('.choice-set-input');
+        if (setInput) {
+            let setString = '';
+            if (setObj) {
+                setString = Object.entries(setObj).map(([key, value]) => `${key}=${value}`).join(', ');
+            }
+            setInput.value = setString;
+        }
 
         return row;
     }
@@ -214,7 +228,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateAllNextDialogueDropdowns() {
         const dialogueIds = Object.keys(scenarioState.dialogues);
         const allSelects = document.querySelectorAll('.next-dialogue-select, .choice-next-select, .next-if-false-select');
-        card.querySelector('.next-if-false-select').value = cardData.next_if_false || '';
         
         allSelects.forEach(select => {
             const currentValue = select.value;
@@ -235,6 +248,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const cardData = scenarioState.dialogues[cardId];
             if (cardData) {
                 card.querySelector('.next-dialogue-select').value = cardData.next || '';
+                
+                // Handle next-if-false select if it exists
+                const nextIfFalseSelect = card.querySelector('.next-if-false-select');
+                if (nextIfFalseSelect) {
+                    nextIfFalseSelect.value = cardData.next_if_false || '';
+                }
+                
                 card.querySelectorAll('.choice-row').forEach((row, index) => {
                    if(cardData.choices && cardData.choices[index]) {
                        row.querySelector('.choice-next-select').value = cardData.choices[index].next || '';
