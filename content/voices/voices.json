@@ -1,0 +1,154 @@
+{
+    "voices": {
+        "Zephyr": {
+            "name": "Зефир",
+            "gender": "F",
+            "example": "/static/audio/voice/voice_preview/Zephyr.wav"
+        },
+        "Puck": {
+            "name": "Пак",
+            "gender": "M",
+            "example": "/static/audio/voice/voice_preview/Puck.wav"
+        },
+        "Charon": {
+            "name": "Харон",
+            "gender": "M",
+            "example": "/static/audio/voice/voice_preview/Charon.wav"
+        },
+        "Kore": {
+            "name": "Кора",
+            "gender": "F",
+            "example": "/static/audio/voice/voice_preview/Kore.wav"
+        },
+        "Fenrir": {
+            "name": "Фенрир",
+            "gender": "M",
+            "example": "/static/audio/voice/voice_preview/Fenrir.wav"
+        },
+        "Leda": {
+            "name": "Леда",
+            "gender": "F",
+            "example": "/static/audio/voice/voice_preview/Leda.wav"
+        },
+        "Orus": {
+            "name": "Орус",
+            "gender": "M",
+            "example": "/static/audio/voice/voice_preview/Orus.wav"
+        },
+        "Aoede": {
+            "name": "Аэда",
+            "gender": "F",
+            "example": "/static/audio/voice/voice_preview/Aoede.wav"
+        },
+        "Callirrhoe": {
+            "name": "Каллироэ",
+            "gender": "F",
+            "example": "/static/audio/voice/voice_preview/Callirrhoe.wav"
+        },
+        "Autonoe": {
+            "name": "Автоноя",
+            "gender": "F",
+            "example": "/static/audio/voice/voice_preview/Autonoe.wav"
+        },
+        "Enceladus": {
+            "name": "Энцелад",
+            "gender": "M",
+            "example": "/static/audio/voice/voice_preview/Enceladus.wav"
+        },
+        "Iapetus": {
+            "name": "Япет",
+            "gender": "M",
+            "example": "/static/audio/voice/voice_preview/Iapetus.wav"
+        },
+        "Umbriel": {
+            "name": "Умбриэль",
+            "gender": "M",
+            "example": "/static/audio/voice/voice_preview/Umbriel.wav"
+        },
+        "Algieba": {
+            "name": "Альгиеба",
+            "gender": "M",
+            "example": "/static/audio/voice/voice_preview/Algieba.wav"
+        },
+        "Despina": {
+            "name": "Деспина",
+            "gender": "F",
+            "example": "/static/audio/voice/voice_preview/Despina.wav"
+        },
+        "Erinome": {
+            "name": "Эринома",
+            "gender": "F",
+            "example": "/static/audio/voice/voice_preview/Erinome.wav"
+        },
+        "Algenib": {
+            "name": "Альгениб",
+            "gender": "M",
+            "example": "/static/audio/voice/voice_preview/Algenib.wav"
+        },
+        "Rasalgethi": {
+            "name": "Расальгети",
+            "gender": "M",
+            "example": "/static/audio/voice/voice_preview/Rasalgethi.wav"
+        },
+        "Laomedeia": {
+            "name": "Лаомедея",
+            "gender": "F",
+            "example": "/static/audio/voice/voice_preview/Laomedeia.wav"
+        },
+        "Achernar": {
+            "name": "Ахернар",
+            "gender": "M",
+            "example": "/static/audio/voice/voice_preview/Achernar.wav"
+        },
+        "Alnilam": {
+            "name": "Альнилам",
+            "gender": "M",
+            "example": "/static/audio/voice/voice_preview/Alnilam.wav"
+        },
+        "Schedar": {
+            "name": "Шедар",
+            "gender": "F",
+            "example": "/static/audio/voice/voice_preview/Schedar.wav"
+        },
+        "Gacrux": {
+            "name": "Гакрукс",
+            "gender": "M",
+            "example": "/static/audio/voice/voice_preview/Gacrux.wav"
+        },
+        "Pulcherrima": {
+            "name": "Пульхеррима",
+            "gender": "F",
+            "example": "/static/audio/voice/voice_preview/Pulcherrima.wav"
+        },
+        "Achird": {
+            "name": "Ахирд",
+            "gender": "F",
+            "example": "/static/audio/voice/voice_preview/Achird.wav"
+        },
+        "Zubenelgenubi": {
+            "name": "Зубенэльгенуби",
+            "gender": "M",
+            "example": "/static/audio/voice/voice_preview/Zubenelgenubi.wav"
+        },
+        "Vindemiatrix": {
+            "name": "Виндемиатрикс",
+            "gender": "F",
+            "example": "/static/audio/voice/voice_preview/Vindemiatrix.wav"
+        },
+        "Sadachbia": {
+            "name": "Садахбия",
+            "gender": "M",
+            "example": "/static/audio/voice/voice_preview/Sadachbia.wav"
+        },
+        "Sadaltager": {
+            "name": "Садальтагер",
+            "gender": "M",
+            "example": "/static/audio/voice/voice_preview/Sadaltager.wav"
+        },
+        "Sulafat": {
+            "name": "Сулафат",
+            "gender": "F",
+            "example": "/static/audio/voice/voice_preview/Sulafat.wav"
+        }
+    }
+}

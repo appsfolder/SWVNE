@@ -45,14 +45,23 @@
         <div class="creator-card">
             <h3>Основные данные</h3>
             <br>
-            <div class="grid" style="grid-template-columns: 2fr 2fr 1fr;">
+            <div class="grid" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
                 <div class="form-group">
-                    <label for="char-id">ID Персонажа (латиница, без пробелов)</label>
+                    <label for="char-id">ID Персонажа (латиница)</label>
                     <input type="text" id="char-id" placeholder="character_id" required>
                 </div>
                 <div class="form-group">
                     <label for="char-name">Имя персонажа (как в игре)</label>
                     <input type="text" id="char-name" placeholder="Имя персонажа" required>
+                </div>
+                <div class="form-group">
+                    <label for="char-voice">Голос персонажа</label>
+                    <div class="audio-control-wrapper">
+                        <select id="char-voice" class="form-control">
+                            <option value="">-- Не выбран --</option>
+                        </select>
+                        <button type="button" class="btn btn--disabled audio-preview-btn" data-type="voice" disabled>▶</button>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="char-color">Цвет имени в диалогах</label>
@@ -77,6 +86,9 @@
         <div class="progress-text" id="progress-text">Загрузка...</div>
     </div>
 
+    <script id="voices-data" type="application/json">
+        {{ voices_json|safe }}
+    </script>
     <script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
     <script src="{{ url_for('static', filename='js/character_creator.js') }}"></script>
 </body>

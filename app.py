@@ -40,11 +40,14 @@ def scan_audio_files(subfolder):
     paths = [f"/static/audio/{subfolder}/{os.path.basename(f)}" for f in files]
     return sorted(paths)
 
+
+
 class VisualNovelManager:
     def __init__(self, content_path):
         self.content_path = content_path
         self.characters = {}
         self.scenes = {}
+        self.voices = {}
         self.scenarios = {}
         self.load_all_content()
 
@@ -52,7 +55,8 @@ class VisualNovelManager:
         """Сканирует папки и загружает весь контент из JSON файлов."""
         self.characters = self._load_from_directory(os.path.join(self.content_path, 'characters'), 'characters')
         self.scenes = self._load_from_directory(os.path.join(self.content_path, 'scenes'), 'scenes')
-        self.scenarios = self._load_from_directory(os.path.join(self.content_path, 'scenarios'), 'scenarios') # << ИЗМЕНЕНО
+        self.scenarios = self._load_from_directory(os.path.join(self.content_path, 'scenarios'), 'scenarios')
+        self.voices = self._load_from_directory(os.path.join(self.content_path, 'voices'), 'voices')
         
         print(f"Loaded {len(self.characters)} characters, {len(self.scenes)} scenes, {len(self.scenarios)} scenarios.")
 
@@ -89,6 +93,8 @@ class VisualNovelManager:
              self.scenes = self._load_from_directory(os.path.join(self.content_path, 'scenes'), 'scenes')
         elif content_type == 'scenarios':
              self.scenarios = self._load_from_directory(os.path.join(self.content_path, 'scenarios'), 'scenarios')
+        elif content_type == 'voices':
+             self.voices = self._load_from_directory(os.path.join(self.content_path, 'voices'), 'voices')
 
 content_dir = os.path.join(os.path.dirname(__file__), 'content')
 
@@ -775,7 +781,11 @@ def update_location_name():
 @app.route('/character-creator')
 def character_creator():
     """Отдаёт страницу редактора персонажей."""
-    return render_template('character_creator.html')
+    manager = VisualNovelManager(content_dir)
+    voices_data = manager.voices
+    voices_json = json.dumps(voices_data)
+
+    return render_template('character_creator.html', voices_json=voices_json)
 
 
 if __name__ == '__main__':

@@ -1451,12 +1451,12 @@ select.form-control,
     padding: 8px 12px;
 }
 
-.audio-preview-btn:disabled {
-    background-color: #ced4da;
-    color: #6c757d;
-    cursor: not-allowed;
-    box-shadow: none;
-    transform: none;
+.btn.btn--disabled {
+    background-color: #ced4da !important; /* !important, чтобы перебить другие стили кнопок */
+    color: #6c757d !important;
+    cursor: not-allowed !important;
+    box-shadow: none !important;
+    transform: none !important;
 }
 
 /* Asset Editor Styles */
@@ -1832,6 +1832,16 @@ select.form-control,
     width: 16px;
     height: 16px;
     fill: currentColor;
+}
+
+.voice-female {
+    color: #e0609c;
+    font-weight: 500;
+}
+
+.voice-male {
+    color: #5294db;
+    font-weight: 500;
 }
 
 @media (max-width: 768px) {
