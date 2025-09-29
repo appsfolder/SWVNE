@@ -108,6 +108,93 @@ class NotificationSystem {
         });
     }
 
+    // Show modal prompt for text input
+    prompt(title, message, defaultValue = '') {
+        return new Promise((resolve) => {
+            // Remove existing modal if any
+            const existingModal = document.querySelector('.modal-overlay');
+            if (existingModal) {
+                existingModal.remove();
+            }
+
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay';
+            overlay.innerHTML = `
+                <div class="modal">
+                    <div class="modal-header">
+                        <div class="modal-title">
+                            <div class="modal-icon info">i</div>
+                            ${title}
+                        </div>
+                    </div>
+                    <div class="modal-body">
+                        ${message.replace(/\n/g, '<br>')}
+                        <input type="text" class="modal-input" value="${defaultValue}" placeholder="Введите значение..." />
+                    </div>
+                    <div class="modal-footer">
+                        <button class="modal-button secondary" data-button="cancel">Отмена</button>
+                        <button class="modal-button primary" data-button="ok">ОК</button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(overlay);
+            
+            const input = overlay.querySelector('.modal-input');
+            const cancelBtn = overlay.querySelector('[data-button="cancel"]');
+            const okBtn = overlay.querySelector('[data-button="ok"]');
+            
+            // Focus and select input
+            setTimeout(() => {
+                input.focus();
+                input.select();
+            }, 100);
+            
+            // Handle OK button
+            const handleOk = () => {
+                const value = input.value.trim();
+                this.closeModal();
+                resolve(value);
+            };
+            
+            // Handle Cancel button
+            const handleCancel = () => {
+                this.closeModal();
+                resolve(null);
+            };
+            
+            okBtn.addEventListener('click', handleOk);
+            cancelBtn.addEventListener('click', handleCancel);
+            
+            // Handle Enter key in input
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleOk();
+                }
+            });
+            
+            // Close on overlay click
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    handleCancel();
+                }
+            });
+            
+            // Close on Escape key
+            const escapeHandler = (e) => {
+                if (e.key === 'Escape') {
+                    document.removeEventListener('keydown', escapeHandler);
+                    handleCancel();
+                }
+            };
+            document.addEventListener('keydown', escapeHandler);
+            
+            // Show modal
+            setTimeout(() => overlay.classList.add('show'), 10);
+        });
+    }
+
     // Show modal with custom buttons
     showModal(title, message, type = 'info', buttons = []) {
         // Remove existing modal if any

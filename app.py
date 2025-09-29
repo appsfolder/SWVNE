@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify, session, redirect, u
 import json
 import os
 import glob
+import uuid
 from werkzeug.utils import secure_filename
 import hashlib
 
@@ -473,6 +474,309 @@ def list_characters():
         
     except Exception as e:
         return jsonify({'error': 'Ошибка сервера'}), 500
+
+# Asset management routes
+@app.route('/asset-editor')
+def asset_editor():
+    """Asset editor page."""
+    return render_template('asset_editor.html')
+
+@app.route('/api/assets/list')
+def list_assets():
+    """Get list of available assets (BGM, SFX, scenes)."""
+    try:
+        assets = {
+            'bgm': [],
+            'sfx': [],
+            'locations': []
+        }
+        
+        # Scan BGM files
+        bgm_dir = os.path.join('static', 'audio', 'bgm')
+        if os.path.exists(bgm_dir):
+            for filename in os.listdir(bgm_dir):
+                if filename.lower().endswith(('.mp3', '.ogg', '.wav')):
+                    filepath = os.path.join(bgm_dir, filename)
+                    assets['bgm'].append({
+                        'name': filename,
+                        'path': f'/static/audio/bgm/{filename}',
+                        'size': os.path.getsize(filepath)
+                    })
+        
+        # Scan SFX files
+        sfx_dir = os.path.join('static', 'audio', 'sfx')
+        if os.path.exists(sfx_dir):
+            for filename in os.listdir(sfx_dir):
+                if filename.lower().endswith(('.mp3', '.ogg', '.wav')):
+                    filepath = os.path.join(sfx_dir, filename)
+                    assets['sfx'].append({
+                        'name': filename,
+                        'path': f'/static/audio/sfx/{filename}',
+                        'size': os.path.getsize(filepath)
+                    })
+        
+        # Load location files from content/scenes/locations.json
+        locations_json_path = os.path.join(content_dir, 'scenes', 'locations.json')
+        if os.path.exists(locations_json_path):
+            try:
+                with open(locations_json_path, 'r', encoding='utf-8') as f:
+                    locations_data = json.load(f)
+                
+                for location_id, location_info in locations_data.get('scenes', {}).items():
+                    background_path = location_info.get('background', '')
+                    if background_path.startswith('/static/locations/'):
+                        filename = background_path.split('/')[-1]
+                        filepath = os.path.join('static', 'locations', filename)
+                        
+                        if os.path.exists(filepath):
+                            assets['locations'].append({
+                                'id': location_id,
+                                'name': location_info.get('name', location_id),
+                                'filename': filename,
+                                'path': background_path,
+                                'size': os.path.getsize(filepath)
+                            })
+            except (json.JSONDecodeError, Exception) as e:
+                print(f"Error reading locations.json: {e}")
+        
+        return jsonify({'success': True, 'assets': assets})
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': 'Ошибка сервера'}), 500
+
+@app.route('/api/assets/upload', methods=['POST'])
+def upload_asset():
+    """Upload asset file (audio or image)."""
+    # SECURITY: Require admin authentication
+    if not check_admin():
+        return jsonify({'success': False, 'error': 'Доступ запрещён', 'requires_auth': True}), 403
+        
+    try:
+        if 'file' not in request.files:
+            return jsonify({'success': False, 'error': 'Файл не найден'}), 400
+        
+        file = request.files['file']
+        asset_type = request.form.get('type')  # 'bgm', 'sfx', or 'scenes'
+        
+        if not asset_type or asset_type not in ['bgm', 'sfx', 'locations']:
+            return jsonify({'success': False, 'error': 'Неверный тип ресурса'}), 400
+        
+        if file.filename == '':
+            return jsonify({'success': False, 'error': 'Файл не выбран'}), 400
+        
+        # SECURITY: Validate file extension based on type
+        if asset_type in ['bgm', 'sfx']:
+            allowed_extensions = {'mp3', 'ogg', 'wav'}
+            target_dir = os.path.join('static', 'audio', asset_type)
+        else:  # locations
+            allowed_extensions = {'png', 'jpg', 'jpeg', 'webp'}
+            target_dir = os.path.join('static', 'locations')
+        
+        file_ext = file.filename.rsplit('.', 1)[1].lower() if '.' in file.filename else ''
+        if file_ext not in allowed_extensions:
+            return jsonify({'success': False, 'error': f'Недопустимый формат файла для {asset_type}'}), 400
+        
+        # SECURITY: Use secure_filename and additional sanitization
+        safe_filename = secure_filename(file.filename)
+        if not safe_filename:
+            return jsonify({'success': False, 'error': 'Недопустимое имя файла'}), 400
+        
+        # Create target directory if it doesn't exist
+        os.makedirs(target_dir, exist_ok=True)
+        
+        filepath = os.path.join(target_dir, safe_filename)
+        
+        # SECURITY: Validate that the path is within the expected directory
+        if not os.path.abspath(filepath).startswith(os.path.abspath(target_dir)):
+            return jsonify({'success': False, 'error': 'Недопустимый путь к файлу'}), 400
+        
+        # Check if file already exists
+        if os.path.exists(filepath):
+            return jsonify({'success': False, 'error': 'Файл с таким именем уже существует'}), 400
+        
+        file.save(filepath)
+        
+        # Return the relative path
+        if asset_type in ['bgm', 'sfx']:
+            relative_path = f'/static/audio/{asset_type}/{safe_filename}'
+        else:
+            relative_path = f'/static/locations/{safe_filename}'
+            
+            # For locations, also update content/scenes/locations.json
+            try:
+                locations_json_path = os.path.join(content_dir, 'scenes', 'locations.json')
+                
+                # Load existing locations
+                locations_data = {'scenes': {}}
+                if os.path.exists(locations_json_path):
+                    with open(locations_json_path, 'r', encoding='utf-8') as f:
+                        locations_data = json.load(f)
+                
+                # Generate unique location ID as UUID (limited to 30 characters)
+                location_id = str(uuid.uuid4()).replace('-', '')[:30]
+                
+                # Ensure unique ID (though UUID collision is extremely unlikely)
+                while location_id in locations_data['scenes']:
+                    location_id = str(uuid.uuid4()).replace('-', '')[:30]
+                
+                # Add new location entry
+                locations_data['scenes'][location_id] = {
+                    'name': os.path.splitext(safe_filename)[0].replace('_', ' ').title(),
+                    'background': relative_path
+                }
+                
+                # Create directory if it doesn't exist
+                os.makedirs(os.path.dirname(locations_json_path), exist_ok=True)
+                
+                # Save updated locations.json
+                with open(locations_json_path, 'w', encoding='utf-8') as f:
+                    json.dump(locations_data, f, ensure_ascii=False, indent=2)
+                    
+            except Exception as e:
+                print(f"Error updating locations.json: {e}")
+                # Don't fail the upload if JSON update fails
+        
+        return jsonify({
+            'success': True, 
+            'message': 'Файл загружен успешно',
+            'path': relative_path,
+            'name': safe_filename,
+            'size': os.path.getsize(filepath)
+        })
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': 'Ошибка сервера'}), 500
+
+@app.route('/api/assets/delete', methods=['POST'])
+def delete_asset():
+    """Delete asset file."""
+    # SECURITY: Require admin authentication
+    if not check_admin():
+        return jsonify({'success': False, 'error': 'Доступ запрещён', 'requires_auth': True}), 403
+        
+    try:
+        data = request.get_json()
+        if not data or 'type' not in data or 'path' not in data:
+            return jsonify({'success': False, 'error': 'Неверные параметры'}), 400
+        
+        asset_type = data['type']
+        asset_path = data['path']
+        
+        if asset_type not in ['bgm', 'sfx', 'locations']:
+            return jsonify({'success': False, 'error': 'Неверный тип ресурса'}), 400
+        
+        # SECURITY: Validate path format
+        if asset_type in ['bgm', 'sfx']:
+            expected_prefix = f'/static/audio/{asset_type}/'
+            base_dir = os.path.join('static', 'audio', asset_type)
+        else:
+            expected_prefix = '/static/locations/'
+            base_dir = os.path.join('static', 'locations')
+        
+        if not asset_path.startswith(expected_prefix):
+            return jsonify({'success': False, 'error': 'Недопустимый путь к файлу'}), 400
+        
+        # Extract filename and construct full path
+        filename = asset_path[len(expected_prefix):]
+        safe_filename = secure_filename(filename)
+        
+        if not safe_filename or safe_filename != filename:
+            return jsonify({'success': False, 'error': 'Недопустимое имя файла'}), 400
+        
+        full_path = os.path.join(base_dir, safe_filename)
+        
+        # SECURITY: Validate that the path is within the expected directory
+        if not os.path.abspath(full_path).startswith(os.path.abspath(base_dir)):
+            return jsonify({'success': False, 'error': 'Недопустимый путь к файлу'}), 400
+        
+        if not os.path.exists(full_path):
+            return jsonify({'success': False, 'error': 'Файл не найден'}), 404
+        
+        os.remove(full_path)
+        
+        # For locations, also remove from content/scenes/locations.json
+        if asset_type == 'locations':
+            try:
+                locations_json_path = os.path.join(content_dir, 'scenes', 'locations.json')
+                
+                if os.path.exists(locations_json_path):
+                    with open(locations_json_path, 'r', encoding='utf-8') as f:
+                        locations_data = json.load(f)
+                    
+                    # Find and remove the location entry that matches this path
+                    scenes_to_remove = []
+                    for location_id, location_info in locations_data.get('scenes', {}).items():
+                        if location_info.get('background') == asset_path:
+                            scenes_to_remove.append(location_id)
+                    
+                    # Remove found entries
+                    for location_id in scenes_to_remove:
+                        del locations_data['scenes'][location_id]
+                    
+                    # Save updated locations.json
+                    with open(locations_json_path, 'w', encoding='utf-8') as f:
+                        json.dump(locations_data, f, ensure_ascii=False, indent=2)
+                        
+            except Exception as e:
+                print(f"Error updating locations.json during deletion: {e}")
+                # Don't fail the deletion if JSON update fails
+        
+        return jsonify({
+            'success': True, 
+            'message': 'Файл удален успешно'
+        })
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': 'Ошибка сервера'}), 500
+
+@app.route('/api/assets/update-location', methods=['POST'])
+def update_location_name():
+    """Update location name in locations.json."""
+    # SECURITY: Require admin authentication
+    if not check_admin():
+        return jsonify({'success': False, 'error': 'Доступ запрещён', 'requires_auth': True}), 403
+        
+    try:
+        data = request.get_json()
+        if not data or 'location_id' not in data or 'new_name' not in data:
+            return jsonify({'success': False, 'error': 'Неверные параметры'}), 400
+        
+        location_id = data['location_id']
+        new_name = data['new_name'].strip()
+        
+        if not new_name:
+            return jsonify({'success': False, 'error': 'Имя локации не может быть пустым'}), 400
+        
+        # SECURITY: Validate location_id (UUID format, max 30 chars)
+        if not location_id.isalnum() or len(location_id) > 30:
+            return jsonify({'success': False, 'error': 'Недопустимый ID локации'}), 400
+        
+        locations_json_path = os.path.join(content_dir, 'scenes', 'locations.json')
+        
+        if not os.path.exists(locations_json_path):
+            return jsonify({'success': False, 'error': 'Файл локаций не найден'}), 404
+        
+        # Load existing locations
+        with open(locations_json_path, 'r', encoding='utf-8') as f:
+            locations_data = json.load(f)
+        
+        if location_id not in locations_data.get('scenes', {}):
+            return jsonify({'success': False, 'error': 'Локация не найдена'}), 404
+        
+        # Update the name
+        locations_data['scenes'][location_id]['name'] = new_name
+        
+        # Save updated locations.json
+        with open(locations_json_path, 'w', encoding='utf-8') as f:
+            json.dump(locations_data, f, ensure_ascii=False, indent=2)
+        
+        return jsonify({
+            'success': True, 
+            'message': 'Имя локации обновлено успешно'
+        })
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': 'Ошибка сервера'}), 500
 
 @app.route('/character-creator')
 def character_creator():
