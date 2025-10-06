@@ -1,136 +1,230 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Редактор ресурсов - VNE</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body class="creator-body">
-    <div class="creator-container">
-        <div class="creator-header">
-            <h1>Редактор ресурсов</h1>
-            <div>
-                <a href="/character-creator" class="btn btn--secondary">Редактор персонажей</a>
-                <a href="/scenario-creator" class="btn btn--secondary">Редактор сценариев</a>
-                <a href="/" class="btn btn--secondary">Главное меню</a>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Редактор ресурсов - VNE</title>
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='css/style.css') }}"
+        />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+            integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"
+        />
+    </head>
+    <body class="creator-body">
+        <div class="creator-container">
+            <div class="creator-header">
+                <h1>Редактор ресурсов</h1>
+                <div>
+                    <a href="/character-creator" class="btn btn--primary"
+                        >Редактор персонажей</a
+                    >
+                    <a href="/scenario-creator" class="btn btn--primary"
+                        >Редактор сценариев</a
+                    >
+                    <a href="/" class="btn btn--secondary">Главное меню</a>
+                </div>
             </div>
-        </div>
 
-        <div class="creator-card controls-card">
-            <div class="creator-card-content">
-                <h3>Управление ресурсами</h3>
-                <div class="controls-wrapper">
-                    <button class="btn btn--secondary" id="refresh-assets-btn">Обновить списки</button>
-                    <button class="btn btn--secondary" id="export-assets-btn">Экспортировать список</button>
-                    <input type="file" id="import-assets-input" accept=".json" style="display: none;">
-                    <button class="btn btn--secondary" id="import-assets-btn">Импортировать список</button>
+            <div class="creator-card controls-card">
+                <div class="creator-card-content creator-card-header">
+                    <h3>Управление ресурсами</h3>
+                    <div class="controls-wrapper">
+                        <button
+                            class="btn btn--secondary"
+                            id="refresh-assets-btn"
+                        >
+                            Обновить списки
+                        </button>
+                        <button
+                            class="btn btn--secondary"
+                            id="export-assets-btn"
+                        >
+                            Экспортировать список
+                        </button>
+                        <input
+                            type="file"
+                            id="import-assets-input"
+                            accept=".json"
+                            style="display: none"
+                        />
+                        <button
+                            class="btn btn--secondary"
+                            id="import-assets-btn"
+                        >
+                            Импортировать список
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="creator-card">
+                <div class="asset-section-header">
+                    <h3>Фоновая музыка (BGM)</h3>
+                    <button class="btn btn--primary" id="upload-bgm-btn">
+                        Добавить BGM
+                    </button>
+                </div>
+                <p class="asset-description">
+                    Поддерживаемые форматы: MP3, OGG, WAV
+                </p>
+                <input
+                    type="file"
+                    id="bgm-file-input"
+                    accept=".mp3,.ogg,.wav"
+                    multiple
+                    style="display: none"
+                />
+
+                <div class="assets-grid" id="bgm-assets-grid">
+                    <!-- BGM assets will be dynamically loaded here -->
+                </div>
+            </div>
+
+            <!-- SFX Section -->
+            <div class="creator-card">
+                <div class="asset-section-header">
+                    <h3>Звуковые эффекты (SFX)</h3>
+                    <button class="btn btn--primary" id="upload-sfx-btn">
+                        Добавить SFX
+                    </button>
+                </div>
+                <p class="asset-description">
+                    Поддерживаемые форматы: MP3, OGG, WAV
+                </p>
+                <input
+                    type="file"
+                    id="sfx-file-input"
+                    accept=".mp3,.ogg,.wav"
+                    multiple
+                    style="display: none"
+                />
+
+                <div class="assets-grid" id="sfx-assets-grid">
+                    <!-- SFX assets will be dynamically loaded here -->
+                </div>
+            </div>
+
+            <!-- Locations Section -->
+            <div class="creator-card">
+                <div class="asset-section-header">
+                    <h3>Локации (Фоны)</h3>
+                    <button class="btn btn--primary" id="upload-locations-btn">
+                        Добавить локацию
+                    </button>
+                </div>
+                <p class="asset-description">
+                    Поддерживаемые форматы: PNG, JPG, JPEG, WEBP
+                </p>
+                <input
+                    type="file"
+                    id="locations-file-input"
+                    accept=".png,.jpg,.jpeg,.webp"
+                    multiple
+                    style="display: none"
+                />
+
+                <div class="scenes-grid" id="locations-assets-grid">
+                    <!-- Location assets will be dynamically loaded here -->
                 </div>
             </div>
         </div>
 
-        <!-- BGM Section -->
-        <div class="creator-card">
-            <div class="asset-section-header">
-                <h3>Фоновая музыка (BGM)</h3>
-                <button class="btn btn--primary" id="upload-bgm-btn">Загрузить BGM</button>
+        <!-- Upload Progress -->
+        <div id="upload-progress" class="upload-progress" style="display: none">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
             </div>
-            <p class="asset-description">Поддерживаемые форматы: MP3, OGG, WAV</p>
-            <input type="file" id="bgm-file-input" accept=".mp3,.ogg,.wav" multiple style="display: none;">
-            
-            <div class="assets-grid" id="bgm-assets-grid">
-                <!-- BGM assets will be dynamically loaded here -->
-            </div>
+            <div class="progress-text" id="progress-text">Загрузка...</div>
         </div>
 
-        <!-- SFX Section -->
-        <div class="creator-card">
-            <div class="asset-section-header">
-                <h3>Звуковые эффекты (SFX)</h3>
-                <button class="btn btn--primary" id="upload-sfx-btn">Загрузить SFX</button>
-            </div>
-            <p class="asset-description">Поддерживаемые форматы: MP3, OGG, WAV</p>
-            <input type="file" id="sfx-file-input" accept=".mp3,.ogg,.wav" multiple style="display: none;">
-            
-            <div class="assets-grid" id="sfx-assets-grid">
-                <!-- SFX assets will be dynamically loaded here -->
-            </div>
-        </div>
-
-        <!-- Locations Section -->
-        <div class="creator-card">
-            <div class="asset-section-header">
-                <h3>Локации (Фоны)</h3>
-                <button class="btn btn--primary" id="upload-locations-btn">Загрузить локацию</button>
-            </div>
-            <p class="asset-description">Поддерживаемые форматы: PNG, JPG, JPEG, WEBP</p>
-            <input type="file" id="locations-file-input" accept=".png,.jpg,.jpeg,.webp" multiple style="display: none;">
-            
-            <div class="scenes-grid" id="locations-assets-grid">
-                <!-- Location assets will be dynamically loaded here -->
-            </div>
-        </div>
-    </div>
-
-    <!-- Upload Progress -->
-    <div id="upload-progress" class="upload-progress" style="display: none;">
-        <div class="progress-bar">
-            <div class="progress-fill" id="progress-fill"></div>
-        </div>
-        <div class="progress-text" id="progress-text">Загрузка...</div>
-    </div>
-
-    <!-- Templates -->
-    <template id="audio-asset-template">
-        <div class="asset-card audio-asset">
-            <div class="asset-header">
-                <h4 class="asset-name"></h4>
-                <div class="asset-actions">
-                    <button class="btn btn--small btn--secondary play-btn" title="Воспроизвести">▶</button>
-                    <button class="btn btn--small btn--danger delete-btn" title="Удалить">🗑</button>
+        <!-- Templates -->
+        <template id="audio-asset-template">
+            <div class="asset-card audio-asset">
+                <div class="asset-header">
+                    <h4 class="asset-name"></h4>
+                    <div class="asset-actions">
+                        <button
+                            class="btn btn--small btn--secondary play-btn"
+                            title="Воспроизвести"
+                        >
+                            ▶
+                        </button>
+                        <button
+                            class="btn btn--small btn--danger delete-btn"
+                            title="Удалить"
+                        >
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="asset-info">
+                    <span class="asset-path"></span>
+                    <span class="asset-size"></span>
                 </div>
             </div>
-            <div class="asset-info">
-                <span class="asset-path"></span>
-                <span class="asset-size"></span>
-            </div>
-        </div>
-    </template>
+        </template>
 
-    <template id="location-asset-template">
-        <div class="asset-card location-asset">
-            <div class="location-preview">
-                <img class="location-image" src="" alt="Location preview">
-            </div>
-            <div class="asset-header">
-                <h4 class="asset-name"></h4>
-                <div class="asset-actions">
-                    <button class="btn btn--small btn--secondary preview-btn" title="Предпросмотр">Превью</button>
-                    <button class="btn btn--small btn--secondary edit-btn" title="Редактировать">✎</button>
-                    <button class="btn btn--small btn--danger delete-btn" title="Удалить">🗑</button>
+        <template id="location-asset-template">
+            <div class="asset-card location-asset">
+                <div class="location-preview">
+                    <img class="location-image" src="" alt="Location preview" />
+                </div>
+                <div class="asset-header">
+                    <h4 class="asset-name"></h4>
+                    <div class="asset-actions">
+                        <button
+                            class="btn btn--small btn--secondary preview-btn"
+                            title="Предпросмотр"
+                        >
+                            Превью
+                        </button>
+                        <button
+                            class="btn btn--small btn--secondary edit-btn"
+                            title="Редактировать"
+                        >
+                            <i class="fa-solid fa-pencil"></i>
+                        </button>
+                        <button
+                            class="btn btn--small btn--danger delete-btn"
+                            title="Удалить"
+                        >
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="asset-info">
+                    <span class="asset-path"></span>
+                    <span class="asset-size"></span>
                 </div>
             </div>
-            <div class="asset-info">
-                <span class="asset-path"></span>
-                <span class="asset-size"></span>
+        </template>
+
+        <!-- Location Preview Modal -->
+        <div id="location-preview-modal" class="modal" style="display: none">
+            <div class="modal-content location-preview-content">
+                <div class="modal-header">
+                    <h3 id="location-preview-title">Предпросмотр локации</h3>
+                    <button class="modal-close" id="close-location-preview">
+                        &times;
+                    </button>
+                </div>
+                <div class="location-preview-body">
+                    <img
+                        id="location-preview-image"
+                        src=""
+                        alt="Location preview"
+                    />
+                </div>
             </div>
         </div>
-    </template>
 
-    <!-- Location Preview Modal -->
-    <div id="location-preview-modal" class="modal" style="display: none;">
-        <div class="modal-content location-preview-content">
-            <div class="modal-header">
-                <h3 id="location-preview-title">Предпросмотр локации</h3>
-                <button class="modal-close" id="close-location-preview">&times;</button>
-            </div>
-            <div class="location-preview-body">
-                <img id="location-preview-image" src="" alt="Location preview">
-            </div>
-        </div>
-    </div>
-
-    <script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/asset_editor.js') }}"></script>
-</body>
+        <script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/asset_editor.js') }}"></script>
+    </body>
 </html>

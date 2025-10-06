@@ -194,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     resetAudioPlayer();
                     audioPlayer.src = asset.path;
                     audioPlayer.play();
-                    playBtn.textContent = '⏸️';
+                    playBtn.textContent = '❚❚';
                     playBtn.classList.add('playing');
                     currentPlayingBtn = playBtn;
                 }
@@ -327,7 +327,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         `Загружено ${uploaded} файл(ов). Ошибки: ${errors.length}`);
                 }
             } else {
-                notifications.error('Ошибка загрузки', `Не удалось загрузить файлы:\\n${errors.join('\\n')}`);
+                notifications.error('Ошибка загрузки', `Не удалось загрузить файлы:\n${errors.join('\n')}`);
             }
             
         } catch (error) {
@@ -341,7 +341,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Delete asset
     async function deleteAsset(type, path, name) {
         const shouldDelete = await notifications.confirm('Удаление ресурса', 
-            `Удалить "${name}"?\\n\\nЭто действие нельзя отменить.`);
+            `Удалить "${name}"?\n\nЭто действие нельзя отменить.`);
         
         if (!shouldDelete) return;
         
@@ -465,15 +465,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 
                 // This is informational import - showing what assets should exist
-                let message = 'Импортированный список содержит:\\n\\n';
+                let message = 'Импортированный список содержит:\n\n';
                 
                 const bgmCount = (data.assets.bgm || []).length;
                 const sfxCount = (data.assets.sfx || []).length;
                 const locationsCount = (data.assets.locations || []).length;
                 
-                message += `BGM: ${bgmCount} файл(ов)\\n`;
-                message += `SFX: ${sfxCount} файл(ов)\\n`;
-                message += `Локации: ${locationsCount} файл(ов)\\n\\n`;
+                message += `BGM: ${bgmCount} файл(ов)\n`;
+                message += `SFX: ${sfxCount} файл(ов)\n`;
+                message += `Локации: ${locationsCount} файл(ов)\n\n`;
                 message += 'Примечание: Это информационный импорт. Сами файлы нужно загружать отдельно.';
                 
                 notifications.success('Импорт завершён', message);
