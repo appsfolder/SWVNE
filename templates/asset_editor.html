@@ -206,15 +206,20 @@
         </template>
 
         <!-- Location Preview Modal -->
-        <div id="location-preview-modal" class="modal" style="display: none">
-            <div class="modal-content location-preview-content">
+        <div id="location-preview-overlay" class="modal-overlay">
+            <div
+                id="location-preview-modal"
+                class="modal location-preview-content"
+            >
                 <div class="modal-header">
-                    <h3 id="location-preview-title">Предпросмотр локации</h3>
-                    <button class="modal-close" id="close-location-preview">
+                    <h3 id="location-preview-title" class="modal-title">
+                        Предпросмотр локации
+                    </h3>
+                    <button id="close-location-preview" class="modal-close">
                         &times;
                     </button>
                 </div>
-                <div class="location-preview-body">
+                <div class="modal-body location-preview-body">
                     <img
                         id="location-preview-image"
                         src=""
