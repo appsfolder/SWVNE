@@ -92,6 +92,34 @@
                 </div>
             </div>
 
+            <div id="scenarioStartScreen" class="screen hidden">
+                <div class="menu-container">
+                    <h1 id="scenarioStartTitle" class="game-title"></h1>
+                    <p
+                        id="scenarioStartDescription"
+                        class="scenario-description-standalone"
+                    ></p>
+                    <p
+                        id="scenarioStartAuthor"
+                        class="scenario-author-standalone"
+                    ></p>
+                    <div class="menu-buttons">
+                        <button
+                            id="scenarioStartButton"
+                            class="btn btn--primary menu-btn"
+                        >
+                            Начать прохождение
+                        </button>
+                        <button
+                            class="btn btn--secondary menu-btn"
+                            onclick="showMainMenu()"
+                        >
+                            К главному меню
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <div id="scenarioSelectionMenu" class="screen hidden">
                 <div class="menu-container">
                     <h1 class="game-title">Выбор сценария</h1>

@@ -1990,3 +1990,18 @@ select.form-control,
         height: 50%;
     }
 }
+
+.scenario-description-standalone {
+    margin: 20px 0;
+    color: var(--color-gray);
+    line-height: 1.5;
+    font-size: var(--font-size-medium);
+}
+
+.scenario-author-standalone {
+    margin-bottom: 30px;
+    font-size: var(--font-size-medium);
+    font-style: normal;
+    font-weight: 600;
+    color: var(--color-dark-blue);
+}
