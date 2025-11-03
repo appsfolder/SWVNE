@@ -7,6 +7,34 @@
     "aeroport_baku": {
       "name": "Аэропорт",
       "background": "/static/locations/aeroport_baku.jpg"
+    },
+    "kaluga_house": {
+      "name": "Дом Циолковского в Калуге",
+      "background": "/static/locations/kaluga_house.jpg"
+    },
+    "design_bureau": {
+      "name": "Конструкторское бюро Королёва",
+      "background": "/static/locations/design_bureau.jpg"
+    },
+    "baikonur_1957": {
+      "name": "Байконур, запуск спутника",
+      "background": "/static/locations/baikonur_1957.jpeg"
+    },
+    "baikonur_1961": {
+      "name": "Байконур, утро Гагарина",
+      "background": "/static/locations/baikonur_1961.jpg"
+    },
+    "space_launch": {
+      "name": "Момент старта",
+      "background": "/static/locations/space_launch.jpg"
+    },
+    "stars": {
+      "name": "Космос",
+      "background": "/static/locations/stars.jpeg"
+    },
+    "time_transition": {
+      "name": "Таймскип",
+      "background": "/static/locations/time_transition.jpeg"
     }
   }
 }

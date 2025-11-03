@@ -51,6 +51,71 @@
         "shy": "/static/character_images/vadim_gefnider/shy.png",
         "curious": "/static/character_images/vadim_gefnider/curious.png"
       }
+    },
+    "tsiolk": {
+      "name": "Константин Циолковский",
+      "color": "#a88f55",
+      "voice": "Orus",
+      "poses": {
+        "angry": "/static/character_images/tsiolk/angry.png",
+        "curious": "/static/character_images/tsiolk/curious.png",
+        "happy": "/static/character_images/tsiolk/happy.png",
+        "neutral": "/static/character_images/tsiolk/neutral.png",
+        "sad": "/static/character_images/tsiolk/sad.png",
+        "shy": "/static/character_images/tsiolk/shy.png"
+      }
+    },
+    "student": {
+      "name": "Ученик",
+      "color": "#7cc6c3",
+      "voice": "",
+      "poses": {
+        "angry": "/static/character_images/student/angry.png",
+        "curious": "/static/character_images/student/curious.png",
+        "happy": "/static/character_images/student/happy.png",
+        "neutral": "/static/character_images/student/neutral.png",
+        "sad": "/static/character_images/student/sad.png",
+        "shy": "/static/character_images/student/shy.png"
+      }
+    },
+    "korolev": {
+      "name": "Сергей Королёв",
+      "color": "#4a79d1",
+      "voice": "Fenrir",
+      "poses": {
+        "angry": "/static/character_images/korolev/angry.png",
+        "curious": "/static/character_images/korolev/curious.png",
+        "happy": "/static/character_images/korolev/happy.png",
+        "neutral": "/static/character_images/korolev/neutral.png",
+        "sad": "/static/character_images/korolev/sad.png",
+        "shy": "/static/character_images/korolev/shy.png"
+      }
+    },
+    "gagarin": {
+      "name": "Юрий Гагарин",
+      "color": "#f4a259",
+      "voice": "Aoede",
+      "poses": {
+        "angry": "/static/character_images/gagarin/angry.png",
+        "curious": "/static/character_images/gagarin/curious.png",
+        "happy": "/static/character_images/gagarin/happy.png",
+        "neutral": "/static/character_images/gagarin/neutral.png",
+        "sad": "/static/character_images/gagarin/sad.png",
+        "shy": "/static/character_images/gagarin/shy.png"
+      }
+    },
+    "engineer": {
+      "name": "Инженер",
+      "color": "#9aa1ac",
+      "voice": "",
+      "poses": {
+        "angry": "/static/character_images/engineer/angry.png",
+        "curious": "/static/character_images/engineer/curious.png",
+        "happy": "/static/character_images/engineer/happy.png",
+        "neutral": "/static/character_images/engineer/neutral.png",
+        "sad": "/static/character_images/engineer/sad.png",
+        "shy": "/static/character_images/engineer/shy.png"
+      }
     }
   }
 }

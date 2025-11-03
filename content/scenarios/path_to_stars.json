@@ -1,0 +1,305 @@
+{
+  "scenarios": {
+    "path_to_stars": {
+      "title": "Путь к звёздам",
+      "description": "Образовательная интерактивная новелла о Константине Циолковском, Сергее Королёве и Юрии Гагарине — людях, открывших дорогу в космос.",
+      "author": "Исторический проект 'Время Космоса'",
+      "start_dialogue": "kaluga_intro",
+      "dialogues": {
+        "kaluga_intro": {
+          "scene": "kaluga_house",
+          "characters_on_screen": [
+            {
+              "id": "tsiolk",
+              "position": "center",
+              "pose": "neutral"
+            }
+          ],
+          "character": "tsiolk",
+          "text": "Человечество не может вечно оставаться на Земле. Настанет день, когда оно шагнёт к звёздам.",
+          "next": "student_enters",
+          "bgm": "/static/audio/bgm/If-I-Can-Stop-One-Fox-From-Breeding.mp3"
+        },
+        "student_enters": {
+          "scene": "kaluga_house",
+          "characters_on_screen": [
+            {
+              "id": "tsiolk",
+              "position": "left",
+              "pose": "neutral"
+            },
+            {
+              "id": "student",
+              "position": "right",
+              "pose": "curious"
+            }
+          ],
+          "character": "student",
+          "text": "Константин Эдуардович, вас считают мечтателем. Разве полёты в космос — не фантазия?",
+          "next": "tsiolk_answer"
+        },
+        "tsiolk_answer": {
+          "scene": "kaluga_house",
+          "characters_on_screen": [
+            {
+              "id": "tsiolk",
+              "position": "left",
+              "pose": "happy"
+            },
+            {
+              "id": "student",
+              "position": "right",
+              "pose": "curious"
+            }
+          ],
+          "character": "tsiolk",
+          "text": "Без мечты нет движения вперёд. Фантазии становятся наукой, когда в них вкладывают труд.",
+          "next": "tsiolk_choice"
+        },
+        "tsiolk_choice": {
+          "scene": "kaluga_house",
+          "characters_on_screen": [
+            {
+              "id": "tsiolk",
+              "position": "left",
+              "pose": "neutral"
+            },
+            {
+              "id": "student",
+              "position": "right",
+              "pose": "curious"
+            }
+          ],
+          "character": "tsiolk",
+          "text": "Как ты думаешь, стоит ли мне опубликовать расчёты реактивного движения или пока рано?",
+          "choices": [
+            {
+              "text": "Опубликовать — наука должна идти вперёд.",
+              "next": "tsiolk_publish",
+              "set": {
+                "courage": "+1"
+              }
+            },
+            {
+              "text": "Подождать — лучше накопить больше доказательств.",
+              "next": "tsiolk_wait",
+              "set": {
+                "caution": "+1"
+              }
+            }
+          ]
+        },
+        "tsiolk_publish": {
+          "scene": "kaluga_house",
+          "characters_on_screen": [
+            {
+              "id": "tsiolk",
+              "position": "center",
+              "pose": "happy"
+            }
+          ],
+          "character": "tsiolk",
+          "text": "Пусть идеи распространяются! Когда-нибудь они вдохновят тех, кто сможет воплотить их в жизнь.",
+          "next": "time_passes"
+        },
+        "tsiolk_wait": {
+          "scene": "kaluga_house",
+          "characters_on_screen": [
+            {
+              "id": "tsiolk",
+              "position": "center",
+              "pose": "sad"
+            }
+          ],
+          "character": "tsiolk",
+          "text": "Пожалуй, время ещё не пришло. Но я продолжу мечтать и писать — чтобы идеи не исчезли.",
+          "next": "time_passes"
+        },
+        "time_passes": {
+          "scene": "time_transition",
+          "characters_on_screen": [],
+          "character": null,
+          "text": "Прошли десятилетия. Работы Циолковского вдохновили новое поколение инженеров и конструкторов.",
+          "next": "korolev_intro"
+        },
+        "korolev_intro": {
+          "scene": "design_bureau",
+          "characters_on_screen": [
+            {
+              "id": "korolev",
+              "position": "center",
+              "pose": "neutral"
+            }
+          ],
+          "character": "korolev",
+          "text": "Каждый запуск — риск. Но без него не бывает прогресса. Главное — верить в команду.",
+          "next": "engineer_conversation"
+        },
+        "engineer_conversation": {
+          "scene": "design_bureau",
+          "characters_on_screen": [
+            {
+              "id": "engineer",
+              "pose": "curious"
+            },
+            {
+              "id": "korolev",
+              "pose": "neutral"
+            }
+          ],
+          "character": "engineer",
+          "text": "Сергей Павлович, может, сначала займёмся спутниками? А про человека подумаем позже?",
+          "next": "korolev_choice"
+        },
+        "korolev_choice": {
+          "scene": "design_bureau",
+          "characters_on_screen": [
+            {
+              "id": "engineer",
+              "pose": "curious"
+            },
+            {
+              "id": "korolev",
+              "pose": "neutral"
+            }
+          ],
+          "character": "korolev",
+          "text": "Ты прав, спутники — важный шаг. Но я думаю и о человеке в космосе. Как поступим?",
+          "choices": [
+            {
+              "text": "Начать с простого — сконцентрироваться на спутниках.",
+              "next": "korolev_safe",
+              "set": {
+                "focus": "satellite"
+              }
+            },
+            {
+              "text": "Развивать обе программы параллельно.",
+              "next": "korolev_bold",
+              "set": {
+                "focus": "both"
+              }
+            }
+          ]
+        },
+        "korolev_safe": {
+          "scene": "design_bureau",
+          "characters_on_screen": [
+            {
+              "id": "korolev",
+              "position": "center",
+              "pose": "neutral"
+            }
+          ],
+          "character": "korolev",
+          "text": "Сначала спутники. Малые победы рождают уверенность. Мы всё сделаем шаг за шагом.",
+          "next": "sputnik_launch"
+        },
+        "korolev_bold": {
+          "scene": "design_bureau",
+          "characters_on_screen": [
+            {
+              "id": "korolev",
+              "pose": "neutral"
+            }
+          ],
+          "character": "korolev",
+          "text": "Работать параллельно трудно, но иначе нельзя. Космос ждёт человека.",
+          "next": "sputnik_launch"
+        },
+        "sputnik_launch": {
+          "scene": "baikonur_1957",
+          "characters_on_screen": [],
+          "character": null,
+          "text": "4 октября 1957 года в небо поднялся первый искусственный спутник Земли. Эра космоса началась.",
+          "next": "gagarin_intro"
+        },
+        "gagarin_intro": {
+          "scene": "baikonur_1961",
+          "characters_on_screen": [
+            {
+              "id": "gagarin",
+              "pose": "neutral"
+            }
+          ],
+          "character": "gagarin",
+          "text": "Скоро я поднимусь туда, где ещё не был ни один человек. Осталось сделать выбор — готов ли я?",
+          "next": "gagarin_choice"
+        },
+        "gagarin_choice": {
+          "scene": "baikonur_1961",
+          "characters_on_screen": [
+            {
+              "id": "gagarin",
+              "position": "left",
+              "pose": "neutral"
+            },
+            {
+              "id": "korolev",
+              "position": "right",
+              "pose": "neutral"
+            }
+          ],
+          "character": "korolev",
+          "text": "Юра, решение за тобой. Этот полёт может изменить всё. Что скажешь?",
+          "choices": [
+            {
+              "text": "Я готов. Поехали!",
+              "next": "gagarin_launch",
+              "set": {
+                "accept": "+1"
+              }
+            },
+            {
+              "text": "Нет... пусть полетит кто-то другой.",
+              "next": "gagarin_refuse",
+              "set": {
+                "accept": "-1"
+              }
+            }
+          ]
+        },
+        "gagarin_refuse": {
+          "scene": "baikonur_1961",
+          "characters_on_screen": [
+            {
+              "id": "gagarin",
+              "pose": "sad"
+            }
+          ],
+          "character": "gagarin",
+          "text": "Я не готов. Но кто-то другой обязательно сделает этот шаг.",
+          "next": "final_reflection"
+        },
+        "final_reflection": {
+          "scene": "stars",
+          "characters_on_screen": [],
+          "character": null,
+          "text": "От мечты Циолковского до полёта Гагарина — путь длиной в десятилетия. Каждый сделал свой шаг к звёздам.",
+          "next": "mechtateli"
+        },
+        "gagarin_launch": {
+          "scene": "space_launch",
+          "characters_on_screen": [
+            {
+              "id": "gagarin",
+              "pose": "neutral"
+            },
+            {
+              "id": "korolev",
+              "pose": "neutral"
+            }
+          ],
+          "character": "gagarin",
+          "text": "Поехали!",
+          "next": "final_reflection",
+          "bgm": "/static/audio/bgm/Rise-of-the-Titans.mp3"
+        },
+        "mechtateli": {
+          "text": "Но путь к звёздам не заканчивается — впереди всё ещё ждут новые мечтатели, новые открытия и новые первые шаги.",
+          "scene": ""
+        }
+      }
+    }
+  }
+}
