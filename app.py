@@ -263,7 +263,6 @@ def scenario_creator():
 @app.route('/api/scenarios/save', methods=['POST'])
 def save_scenario():
     """Save scenario data to file."""
-    # SECURITY: Require admin authentication
     if not check_admin():
         return jsonify({'success': False, 'error': 'Доступ запрещён', 'requires_auth': True}), 403
 
@@ -732,7 +731,6 @@ def delete_asset():
 @app.route('/api/assets/update-location', methods=['POST'])
 def update_location_name():
     """Update location name in locations.json."""
-    # SECURITY: Require admin authentication
     if not check_admin():
         return jsonify({'success': False, 'error': 'Доступ запрещён', 'requires_auth': True}), 403
 
